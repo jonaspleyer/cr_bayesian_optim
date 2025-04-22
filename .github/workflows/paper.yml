@@ -18,13 +18,12 @@ jobs:
           root_file: ${{ env.main }}.tex
           latexmk_shell_escape: true
           args: -pdf -shell-escape -cd ${{ env.dir }}
-        run: mv ${{ env.dir }}/${{ env.main }}.pdf .
 
       - name: Upload pdf as artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.main }}.pdf
-          path: ${{ env.main }}.pdf
+          path: ${{ env.dir}}/${{ env.main }}.pdf
   
   release_pdf:
     name: Release PDF
