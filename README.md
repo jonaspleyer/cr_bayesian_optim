@@ -1,3 +1,8 @@
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jonaspleyer/cr_bayesian_optim/paper.yml?style=flat-square&label=Paper)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jonaspleyer/cr_bayesian_optim/CI.yml?style=flat-square&label=Build)
+![GitHub License](https://img.shields.io/github/license/jonaspleyer/cr_bayesian_optim?style=flat-square&label=License)
+[![Docs](https://img.shields.io/github/actions/workflow/status/jonaspleyer/cr_bayesian_optim/sphinx_doc.yml?label=Docs&style=flat-square)](https://github.com/jonaspleyer/cr_bayesian_optim/actions)
+
 # cr_bayesian_optim
 
 This project combines Bayesian Optimization with Agent-Based simulations of cellular systems done by
