@@ -15,9 +15,9 @@ jobs:
       - name: Compile
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: ${{ env.main }}.tex
+          root_file: ${{ env.dir }}/${{ env.main }}.tex
           latexmk_shell_escape: true
-          args: -pdf -shell-escape -cd ${{ env.dir}}/${{ env.dir }}
+          args: -pdf -shell-escape -cd
 
       - name: Upload pdf as artifact
         uses: actions/upload-artifact@v4
