@@ -1,0 +1,13 @@
+[package]
+name = "cr_bayesian_optim"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "cr_bayesian_optim"
+crate-type = ["cdylib"]
+
+[dependencies]
+cellular_raza = "0.2.3"
+pyo3 = "0.24.0"
