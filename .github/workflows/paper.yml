@@ -2,7 +2,6 @@ name: Build LaTeX document
 on: push
 
 env:
-  main: main
   dir: paper
 jobs:
   build_latex:
@@ -13,18 +12,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Compile
-        uses: xu-cheng/latex-action@v3
-        with:
-          root_file: ${{ env.dir }}/${{ env.main }}.tex
-          latexmk_shell_escape: true
-          args: -pdf -shell-escape -cd
+        run: make -C paper zip
 
       - name: Upload pdf as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.main }}.pdf
-          path: ${{ env.dir}}/${{ env.main }}.pdf
-  
+          name: paper.zip
+          path: ${{ env.dir}}/paper.zip
+
   release_pdf:
     name: Release PDF
     needs: build_latex
@@ -35,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ env.main }}.pdf
+          name: paper.zip
 
       - name: Set outputs
         id: vars
@@ -43,5 +38,5 @@ jobs:
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: ${{ env.main }}.pdf
-          tag: ${{ steps.vars.outputs.sha_short }}
+          artifacts: paper.zip
+          tag: paper-${{ steps.vars.outputs.sha_short }}
