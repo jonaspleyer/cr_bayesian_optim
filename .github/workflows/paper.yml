@@ -11,6 +11,9 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v4
 
+      - name: Install latexmk
+        run: sudo apt-get install texlive-full
+
       - name: Compile
         run: make -C paper zip
 
