@@ -23,4 +23,4 @@ fresh: clean all
 
 zip: fresh
 	$(MAKE) clean_partial
-	zip archive.zip -r *
+	zip paper.zip -r *
