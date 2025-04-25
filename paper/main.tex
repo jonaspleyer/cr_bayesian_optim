@@ -187,6 +187,17 @@ Maybe cite these:
     \label{fig:bacterial-branching-sim}
 \end{figure}
 
+%...................................................................................................
+\subsubsection{Calculating the fractal dimension}
+\begin{enumerate}
+    \item Take all points of bacteria $x_i$ within the simulation domain
+    \item Discretize the space at arbitrary (up to size of one cell) lattice size $\Delta x$
+    \item Assign each grid-point the value $1$ if a cell is inside or $0$ otherwise
+    \item Calculate which cells contain living cells and
+    \item Calculate the scaling behaviour as $\Delta x\rightarrow0$ starting at a large (possibly
+        trivially large) size for $\Delta x$
+\end{enumerate}
+
 %###################################################################################################
 \section{Optimization}
 \label{section:optimization}
