@@ -15,5 +15,8 @@ dependencies = [
     "egobox"
 ]
 
+[project.scripts]
+crb_fractal_dim = "cr_bayesian_optim:fractal_dim_main"
+
 [tool.maturin]
 features = ["pyo3/extension-module"]
