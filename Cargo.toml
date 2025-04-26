@@ -16,7 +16,6 @@ approxim = "0.6.5"
 # cellular_raza = { git = "https://github.com/jonaspleyer/cellular_raza", features = [ "pyo3" ] }
 cellular_raza = { path = "../../03-software/cellular_raza/cellular_raza", features = [ "pyo3",
     "approx" ] }
-ego = "1.1.7"
 nalgebra = "0.33.2"
 num = "0.4"
 pyo3 = "0.24"
