@@ -5,4 +5,4 @@ Scripts
    :maxdepth: 2
    :titlesonly:
 
-    crb_script1 <crb_script1>
+    crb_fractal_dim <crb_fractal_dim>

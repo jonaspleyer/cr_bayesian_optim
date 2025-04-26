@@ -7,7 +7,7 @@ cr_bayesian_optim
    :titlesonly:
    :hidden:
 
-    Documentation <documentation>
+    Documentation <documentation/index>
     Scripts <scripts/index>
     References <references>
     Changelog <changelog>
