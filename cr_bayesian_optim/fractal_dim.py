@@ -102,7 +102,7 @@ def calculate_fractal_dim_over_time(cells: crb.CellOutput, options: crb.Options)
     for i in iterations:
         pos = np.array([c[0].mechanics.pos for c in cells[i].values()])
 
-        popt, pcov, count_boxes = calculate_fractal_dim_for_pos(pos, options, None)
+        x, popt, pcov, count_boxes = calculate_fractal_dim_for_pos(pos, options, None)
         dims.append(popt[0])
 
 
@@ -110,13 +110,16 @@ def calculate_fractal_dim_for_pos(
     pos, options: crb.Options, out_path: Path | None = None
 ):
     x = np.linspace(
-        options.bacteria.cell_radius / 2.0, options.domain.domain_size / 10, 10
+        options.bacteria.cell_radius / 2.0,
+        options.domain.domain_size / 10,
+        10,
+        dtype=float,
     )
     n_voxels_list = np.floor(options.domain.domain_size / x).astype(int)
     fields = [calculate_fields(pos, n, options) for n in n_voxels_list]
     count_boxes = np.array([np.sum(yi > 0) for yi in fields]).astype(int)
 
-    if type(out_path) is Path:
+    if out_path is not None:
         plot_discretizations(pos, n_voxels_list, options, out_path)
 
     popt, pcov = sp.optimize.curve_fit(
@@ -126,65 +129,73 @@ def calculate_fractal_dim_for_pos(
 
 
 def fractal_dim_main():
-    options = crb.Options(show_progressbar=True, storage_location="out")
+    # Initialize Graph
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    xmin = np.inf
+    xmax = -np.inf
+    ymin = np.inf
+    ymax = -np.inf
+
+    options = crb.Options(
+        show_progressbar=True, storage_location="out/fractal_dim_multi"
+    )
     options.time.t_max = 2000
     options.domain.domain_size = 2000
     options.time.dt = 0.3
-    options.domain.diffusion_constant = 2
+    diffusion_constants = [80, 5, 0.5]
+    for diffusion_constant in diffusion_constants:
+        options.domain.diffusion_constant = diffusion_constant
 
-    cells, out_path = load_or_compute(options)
+        cells, out_path = load_or_compute(options)
+        last_pos = np.array([c[0].mechanics.pos for c in cells.values()])
 
-    last_pos = np.array([c[0].mechanics.pos for c in cells.values()])
+        x, y, popt, _ = calculate_fractal_dim_for_pos(last_pos, options, out_path)
+        ax.plot(x, y, color=COLOR1, linestyle="-", label=f"D={diffusion_constant:2}")
 
-    x, count_boxes, popt, _ = calculate_fractal_dim_for_pos(last_pos, options, out_path)
+        xmin = min(np.min(x), xmin)
+        xmax = max(np.max(x), xmax)
+        ymin = min(np.min(y), ymin)
+        ymax = max(np.max(y), ymax)
 
-    # Initialize Graph
-    fig, ax = plt.subplots(figsize=(8, 8))
+        a, b = popt
+        ax.plot(
+            x,
+            np.exp(a * np.log(x) + b),
+            label="LR",
+            color=COLOR5,
+            linestyle="--",
+            linewidth=1.5,
+        )
+
     ax.vlines(
         2 * options.bacteria.cell_radius,
-        np.min(count_boxes),
-        np.max(count_boxes),
+        ymin,
+        ymax,
         color=COLOR2,
         linestyle="--",
         label="2x Radius",
     )
 
-    ax.plot(
-        x,
-        count_boxes,
-        color=COLOR1,
-        linestyle="-",
-        label="Data",
-    )
-
-    popt, _ = sp.optimize.curve_fit(
-        lambda x, a, b: a * x + b, np.log(x), np.log(count_boxes)
-    )
-
-    a, b = popt
-    ax.plot(
-        x,
-        np.exp(a * np.log(x) + b),
-        label="Linear Fit",
-        color=COLOR5,
-        linestyle="--",
-        linewidth=1.5,
-    )
-
     ax.legend()
     ax.set_xlabel("Voxel Size [µm]")
     ax.set_ylabel("Count")
-    ax.set_ylim((np.min(count_boxes), np.max(count_boxes)))
-    ax.set_xlim((np.min(x).astype(float), np.max(x).astype(float)))
+    ax.set_ylim((ymin, ymax))
+    ax.set_xlim((xmin, xmax))
     ax.set_xscale("log")
     ax.set_yscale("log")
 
     handles, labels = ax.get_legend_handles_labels()
-    desired_order = [1, 2, 0]
+    handles = [handles[0], handles[1], handles[-1]]
+    labels = [
+        "D=" + ",".join([str(i) for i in sorted(diffusion_constants)]),
+        labels[1],
+        labels[-1],
+    ]
 
     ax.legend(
-        [handles[i] for i in desired_order],
-        [labels[i] for i in desired_order],
+        handles,
+        labels,
         loc="upper center",
         bbox_to_anchor=(0.5, 1.10),
         ncol=4,
@@ -195,4 +206,4 @@ def fractal_dim_main():
     ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
     ax.set_axisbelow(True)
     fig.tight_layout()
-    fig.savefig(out_path / "fractal-dimension.pdf")
+    fig.savefig(options.storage_location / "fractal-dimension.pdf")
