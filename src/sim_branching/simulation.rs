@@ -10,12 +10,35 @@ use serde::{Deserialize, Serialize};
 pub type ReactionVector = nalgebra::DVector<f64>;
 
 macro_rules! opt (
-    ($($ti:tt)*) => {
+    ($name:ident $($ti:tt)*) => {
         short_default::default! {
             #[pyclass(get_all, set_all)]
-            #[derive(Clone, Debug, AbsDiffEq, PartialEq)]
+            #[derive(Clone, Debug, AbsDiffEq, PartialEq, Serialize, Deserialize)]
             #[approx(epsilon_type = f64)]
-            pub struct $($ti)*
+            pub struct $name $($ti)*
+        }
+
+        #[pymethods]
+        impl $name {
+            #[new]
+            #[pyo3(signature = (**kwargs))]
+            pub fn new(
+                py: Python,
+                kwargs: Option<&Bound<pyo3::types::PyDict>>
+            ) -> PyResult<Py<$name>> {
+                let new = Py::new(py, $name ::default())?;
+                if let Some(kwds) = kwargs {
+                    for (key, value) in kwds.iter() {
+                        let key: Py<pyo3::types::PyString> = key.extract()?;
+                        new.setattr(py, &key, value)?;
+                    }
+                }
+                Ok(new)
+            }
+
+            pub fn __repr__(&self) -> String {
+                format!("{:#?}", self)
+            }
         }
     }
 );
@@ -51,8 +74,8 @@ opt! { TimeParameters {
     pub save_interval: usize = 200,
 }}
 
-#[pyclass]
-#[derive(Clone)]
+#[pyclass(get_all, set_all)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Options {
     pub bacteria: Py<BacterialParameters>,
     pub domain: Py<DomainParameters>,
