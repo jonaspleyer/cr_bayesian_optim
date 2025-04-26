@@ -86,6 +86,73 @@ pub struct Options {
     pub storage_location: std::path::PathBuf,
 }
 
+#[pymethods]
+impl Options {
+    #[new]
+    #[pyo3(signature = (**kwargs))]
+    fn new(py: Python, kwargs: Option<&Bound<pyo3::types::PyDict>>) -> PyResult<Py<Self>> {
+        let new = Py::new(
+            py,
+            Self {
+                bacteria: Py::new(py, <BacterialParameters as Default>::default())?,
+                domain: Py::new(py, <DomainParameters as Default>::default())?,
+                time: Py::new(py, <TimeParameters as Default>::default())?,
+                show_progressbar: false,
+                n_threads: 1.try_into().unwrap(),
+                storage_location: "out".into(),
+            },
+        )?;
+        if let Some(kwds) = kwargs {
+            for (key, value) in kwds.iter() {
+                let key: Py<pyo3::types::PyString> = key.extract()?;
+                new.setattr(py, &key, value)?;
+            }
+        }
+        Ok(new)
+    }
+
+    fn __repr__(&self, py: Python) -> PyResult<String> {
+        use std::io::Write;
+        let mut out = Vec::new();
+        write!(out, "Options {{")?;
+        let fields = [
+            format!("{}", self.bacteria.call_method0(py, "__repr__")?),
+            format!("{}", self.bacteria.call_method0(py, "__repr__")?),
+            format!("{}", self.domain.call_method0(py, "__repr__")?),
+            format!("{}", self.time.call_method0(py, "__repr__")?),
+        ];
+        for field in fields {
+            for line in field.lines() {
+                writeln!(out)?;
+                write!(out, "    {}", line)?;
+            }
+            write!(out, ",")?;
+        }
+        writeln!(out, "\n}}")?;
+        Ok(String::from_utf8(out)?)
+    }
+
+    fn save_to_toml(&self, path: std::path::PathBuf) -> PyResult<()> {
+        use std::io::prelude::*;
+        let serialized_toml = toml::to_string_pretty(&self)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("{e}")))?;
+        let mut file = std::fs::File::create(path)?;
+        file.write_all(serialized_toml.as_bytes())?;
+        Ok(())
+    }
+
+    #[staticmethod]
+    fn load_from_toml(path: std::path::PathBuf) -> PyResult<Self> {
+        let contents = std::fs::read_to_string(path)?;
+        toml::from_str(&contents)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("{e}")))
+    }
+
+    fn __eq__(&self, other: &Self) -> bool {
+        self.abs_diff_eq(other, Self::default_epsilon())
+    }
+}
+
 impl PartialEq for Options {
     fn eq(&self, other: &Self) -> bool {
         Python::with_gil(|py| {
