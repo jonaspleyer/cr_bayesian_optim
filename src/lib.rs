@@ -9,6 +9,9 @@ use sim_branching::*;
 #[pymodule]
 fn cr_bayesian_optim(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(run_sim_branching, m)?)?;
+    m.add_function(wrap_pyfunction!(load_results, m)?)?;
+    m.add_function(wrap_pyfunction!(load_results_at_iteration, m)?)?;
+    m.add_function(wrap_pyfunction!(get_all_iterations, m)?)?;
     m.add_class::<Options>()?;
     m.add_class::<BacterialParameters>()?;
     m.add_class::<DomainParameters>()?;
