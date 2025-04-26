@@ -282,13 +282,15 @@ pub fn run_sim_branching(options: Options, py: Python) -> Result<(), cr::Simulat
         initial_value: ReactionVector::from(vec![initial_concentration]),
     };
 
-    let storage = StorageBuilder::new().priority([StorageOption::SerdeJson]);
+    let storage = StorageBuilder::new()
+        .priority([StorageOption::Memory, StorageOption::SerdeJson])
+        .location(&options.storage_location);
     let time = FixedStepsize::from_partial_save_freq(0.0, dt, t_max, save_interval)?;
     let settings = Settings {
-        n_threads: n_threads.try_into().unwrap(),
+        n_threads,
         time,
         storage,
-        show_progressbar: true,
+        show_progressbar: options.show_progressbar,
     };
 
     let _storager = run_simulation!(
