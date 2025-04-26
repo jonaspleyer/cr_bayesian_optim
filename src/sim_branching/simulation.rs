@@ -6,6 +6,7 @@ use pyo3::prelude::*;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
+use std::num::NonZeroUsize;
 
 pub type ReactionVector = nalgebra::DVector<f64>;
 
@@ -80,7 +81,9 @@ pub struct Options {
     pub bacteria: Py<BacterialParameters>,
     pub domain: Py<DomainParameters>,
     pub time: Py<TimeParameters>,
-    pub n_threads: usize,
+    pub show_progressbar: bool,
+    pub n_threads: NonZeroUsize,
+    pub storage_location: std::path::PathBuf,
 }
 
 impl PartialEq for Options {
@@ -109,7 +112,7 @@ impl approxim::AbsDiffEq for Options {
                     .time
                     .borrow(py)
                     .abs_diff_eq(&other.time.borrow(py), epsilon)
-                && self.n_threads.abs_diff_eq(&other.n_threads, 0)
+                && self.n_threads.get().abs_diff_eq(&other.n_threads.get(), 0)
         })
     }
 
