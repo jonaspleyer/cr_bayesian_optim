@@ -3,35 +3,23 @@ use pyo3::prelude::*;
 
 use super::{BacteriaBranching, CellOutput, SingleIter};
 
-static GLOBAL_STORAGER: std::sync::Mutex<
-    Option<
-        cr::StorageManager<cr::CellIdentifier, (cr::CellBox<BacteriaBranching>, serde_json::Value)>,
-    >,
-> = std::sync::Mutex::new(None);
-
 fn cell_storage_for_loading(
     path: &std::path::Path,
 ) -> Result<
     cr::StorageManager<cr::CellIdentifier, (cr::CellBox<BacteriaBranching>, serde_json::Value)>,
     cr::SimulationError,
 > {
-    let mut storager = GLOBAL_STORAGER.lock().unwrap();
-    if let Some(st) = storager.as_ref() {
-        Ok(st.clone())
-    } else {
-        let storage_builder = cr::StorageBuilder::new()
-            .priority([cr::StorageOption::SerdeJson])
-            .location(path)
-            .add_date(false)
-            .suffix("cells")
-            .init();
-        let cells = cr::StorageManager::<
-            cr::CellIdentifier,
-            (cr::CellBox<BacteriaBranching>, serde_json::Value),
-        >::open_or_create(storage_builder, 0)?;
-        *storager = Some(cells.clone());
-        Ok(cells)
-    }
+    let storage_builder = cr::StorageBuilder::new()
+        .priority([cr::StorageOption::SerdeJson])
+        .location(path)
+        .add_date(false)
+        .suffix("cells")
+        .init();
+    let cells = cr::StorageManager::<
+        cr::CellIdentifier,
+        (cr::CellBox<BacteriaBranching>, serde_json::Value),
+    >::open_or_create(storage_builder, 0)?;
+    Ok(cells)
 }
 
 #[pyfunction]
