@@ -20,3 +20,7 @@ type CellIdentifier = tuple[int, int]
 type CellOutput = dict[
     int, dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
 ]
+
+from .plotting import *
+
+from .fractal_dim import fractal_dim_main
