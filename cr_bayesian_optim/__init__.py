@@ -4,4 +4,19 @@
 >>> assert a == "3"
 """
 
-from .cr_bayesian_optim import sum_as_string
+from .cr_bayesian_optim import (
+    run_sim_branching,
+    load_results,
+    load_results_at_iteration,
+    get_all_iterations,
+    Options,
+    BacterialParameters,
+    DomainParameters,
+    TimeParameters,
+    BacteriaBranching,
+)
+
+type CellIdentifier = tuple[int, int]
+type CellOutput = dict[
+    int, dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
+]
