@@ -26,7 +26,7 @@ def get_last_output_path(search_dir: Path | None = Path("out")) -> Path:
     return Path(sorted(list(glob(str(search_dir) + "/*")))[-1])
 
 
-def _get_all_iteration_files(output_path: Path = get_last_output_path()) -> list[Path]:
+def _get_all_iteration_files(output_path: Path) -> list[Path]:
     return [Path(p) for p in sorted(glob(str(output_path) + "/cells/json/*"))]
 
 
@@ -34,7 +34,7 @@ def _iteration_to_file(iteration: int, output_path: Path, cs: str = "cells") -> 
     return output_path / "{}/json/{:020}".format(cs, iteration)
 
 
-def get_all_iterations(output_path: Path = get_last_output_path()) -> list[int]:
+def get_all_iterations(output_path: Path) -> list[int]:
     iterations_files = _get_all_iteration_files(output_path)
     return [int(os.path.basename(it)) for it in iterations_files]
 
@@ -58,9 +58,7 @@ def load_cells_at_iteration(
     return df
 
 
-def load_subdomains_at_iteration(
-    iteration: int, output_path: Path = get_last_output_path()
-) -> pd.DataFrame:
+def load_subdomains_at_iteration(iteration: int, output_path: Path) -> pd.DataFrame:
     iteration_file = _iteration_to_file(iteration, output_path, "subdomains")
     data = []
     for filename in glob(str(iteration_file) + "/*"):
@@ -89,7 +87,7 @@ def plot_iteration(
     iteration: int,
     intra_bounds: tuple[float, float],
     extra_bounds: tuple[float, float],
-    output_path: Path = get_last_output_path(),
+    output_path: Path,
     save_figure: bool = True,
     figsize: int = 32,
 ) -> matplotlib.figure.Figure | None:
@@ -184,7 +182,7 @@ def __plot_all_iterations_helper(args_kwargs):
 def plot_all_iterations(
     intra_bounds: tuple[float, float],
     extra_bounds: tuple[float, float],
-    output_path: Path = get_last_output_path(),
+    output_path: Path,
     n_threads: int | None = None,
     **kwargs,
 ):
@@ -223,14 +221,3 @@ def generate_movie(opath: Path | None = None, play_movie: bool = True):
         print("Playing Movie")
         bashcmd2 = f"firefox ./{opath}/movie.mp4"
         os.system(bashcmd2)
-
-
-if __name__ == "__main__":
-    output_path = get_last_output_path()
-    plot_all_iterations(
-        (0.5, 1),
-        (0, 10.0),
-        output_path,
-    )
-
-    generate_movie(output_path)
