@@ -77,14 +77,28 @@ opt! { TimeParameters {
     pub save_interval: usize = 200,
 }}
 
+fn get_inner<T>(ptp: &Py<T>, py: Python) -> T
+where
+    T: for<'a, 'py> pyo3::conversion::FromPyObjectBound<'a, 'py>,
+{
+    ptp.extract(py).unwrap()
+}
+
 #[pyclass(get_all, set_all)]
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, AbsDiffEq)]
+#[approx(epsilon_type = f64)]
 pub struct Options {
+    #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub bacteria: Py<BacterialParameters>,
+    #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub domain: Py<DomainParameters>,
+    #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub time: Py<TimeParameters>,
+    #[approx(equal)]
     pub show_progressbar: bool,
+    #[approx(equal)]
     pub n_threads: NonZeroUsize,
+    #[approx(equal)]
     pub storage_location: std::path::PathBuf,
 }
 
@@ -163,30 +177,6 @@ impl PartialEq for Options {
                 && self.time.borrow(py).eq(&other.time.borrow(py))
                 && self.n_threads.eq(&other.n_threads)
         })
-    }
-}
-
-impl approxim::AbsDiffEq for Options {
-    type Epsilon = f64;
-    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        Python::with_gil(|py| {
-            self.bacteria
-                .borrow(py)
-                .abs_diff_eq(&other.bacteria.borrow(py), epsilon)
-                && self
-                    .domain
-                    .borrow(py)
-                    .abs_diff_eq(&other.domain.borrow(py), epsilon)
-                && self
-                    .time
-                    .borrow(py)
-                    .abs_diff_eq(&other.time.borrow(py), epsilon)
-                && self.n_threads.get().abs_diff_eq(&other.n_threads.get(), 0)
-        })
-    }
-
-    fn default_epsilon() -> Self::Epsilon {
-        <f64 as AbsDiffEq>::default_epsilon()
     }
 }
 
