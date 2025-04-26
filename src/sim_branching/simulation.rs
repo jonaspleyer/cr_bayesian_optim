@@ -6,7 +6,7 @@ use pyo3::prelude::*;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
-use std::num::NonZeroUsize;
+use std::{collections::BTreeMap, num::NonZeroUsize};
 
 pub type ReactionVector = nalgebra::DVector<f64>;
 
@@ -188,8 +188,14 @@ impl approxim::AbsDiffEq for Options {
     }
 }
 
+pub type SingleIter = BTreeMap<cr::CellIdentifier, (MyAgent, Option<cr::CellIdentifier>)>;
+pub type CellOutput = BTreeMap<u64, SingleIter>;
+
 #[pyfunction]
-pub fn run_sim_branching(options: Options, py: Python) -> Result<(), cr::SimulationError> {
+pub fn run_sim_branching(
+    options: Options,
+    py: Python,
+) -> Result<(CellOutput, std::path::PathBuf), cr::SimulationError> {
     use cr::*;
 
     let BacterialParameters {
@@ -305,5 +311,19 @@ pub fn run_sim_branching(options: Options, py: Python) -> Result<(), cr::Simulat
         eprintln!("Encountered error when saving simulation Options to file:");
         eprintln!("{e}");
     }
-    Ok(())
+    let cells = storager
+        .cells
+        .load_all_elements()?
+        .into_iter()
+        .map(|(iteration, cells)| {
+            (
+                iteration,
+                cells
+                    .into_iter()
+                    .map(|(ident, (cbox, _))| (ident, (cbox.cell, cbox.parent)))
+                    .collect(),
+            )
+        })
+        .collect();
+    Ok((cells, storager.get_path()?))
 }
