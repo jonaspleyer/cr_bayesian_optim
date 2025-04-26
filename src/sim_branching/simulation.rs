@@ -8,6 +8,8 @@ use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, num::NonZeroUsize};
 
+use super::agent::BacteriaBranching;
+
 pub type ReactionVector = nalgebra::DVector<f64>;
 
 macro_rules! opt (
@@ -188,7 +190,7 @@ impl approxim::AbsDiffEq for Options {
     }
 }
 
-pub type SingleIter = BTreeMap<cr::CellIdentifier, (MyAgent, Option<cr::CellIdentifier>)>;
+pub type SingleIter = BTreeMap<cr::CellIdentifier, (BacteriaBranching, Option<cr::CellIdentifier>)>;
 pub type CellOutput = BTreeMap<u64, SingleIter>;
 
 #[pyfunction]
@@ -235,7 +237,7 @@ pub fn run_sim_branching(
             let y = rng.random_range(ds - dx..ds + dx);
 
             let pos = Vector2::from([x, y]);
-            super::MyAgent {
+            BacteriaBranching {
                 mechanics: NewtonDamped2D {
                     pos,
                     vel: Vector2::zero(),

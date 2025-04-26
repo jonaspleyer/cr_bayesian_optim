@@ -6,9 +6,9 @@ use serde::{Deserialize, Serialize};
 
 use super::ReactionVector;
 
-#[pyclass]
+#[pyclass(get_all)]
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, CellAgent, AbsDiffEq)]
-pub struct MyAgent {
+pub struct BacteriaBranching {
     #[Mechanics]
     pub mechanics: NewtonDamped2D,
     #[Interaction]
@@ -18,11 +18,18 @@ pub struct MyAgent {
     pub growth_rate: f64,
 }
 
-impl Cycle<MyAgent, f64> for MyAgent {
+#[pymethods]
+impl BacteriaBranching {
+    fn __repr__(&self) -> String {
+        format!("{:#?}", self)
+    }
+}
+
+impl Cycle<BacteriaBranching, f64> for BacteriaBranching {
     fn update_cycle(
         _rng: &mut rand_chacha::ChaCha8Rng,
         _dt: &f64,
-        cell: &mut MyAgent,
+        cell: &mut BacteriaBranching,
     ) -> Option<CycleEvent> {
         // If the cell is not at the maximum size let it grow
         if cell.interaction.radius > cell.division_radius {
@@ -33,8 +40,8 @@ impl Cycle<MyAgent, f64> for MyAgent {
 
     fn divide(
         rng: &mut rand_chacha::ChaCha8Rng,
-        c1: &mut MyAgent,
-    ) -> Result<MyAgent, DivisionError> {
+        c1: &mut BacteriaBranching,
+    ) -> Result<BacteriaBranching, DivisionError> {
         // Clone existing cell
         let mut c2 = c1.clone();
 
@@ -64,7 +71,7 @@ impl Cycle<MyAgent, f64> for MyAgent {
 
 // COMPONENT DESCRIPTION
 // 0         CELL AREA
-impl Intracellular<ReactionVector> for MyAgent {
+impl Intracellular<ReactionVector> for BacteriaBranching {
     fn set_intracellular(&mut self, intracellular: ReactionVector) {
         self.interaction.radius = (intracellular[0] / PI).powf(0.5);
     }
@@ -74,7 +81,7 @@ impl Intracellular<ReactionVector> for MyAgent {
     }
 }
 
-impl ReactionsExtra<ReactionVector, ReactionVector> for MyAgent {
+impl ReactionsExtra<ReactionVector, ReactionVector> for BacteriaBranching {
     fn calculate_combined_increment(
         &self,
         _intracellular: &ReactionVector,
