@@ -293,7 +293,7 @@ pub fn run_sim_branching(options: Options, py: Python) -> Result<(), cr::Simulat
         show_progressbar: options.show_progressbar,
     };
 
-    let _storager = run_simulation!(
+    let storager = run_simulation!(
         agents: cells,
         domain: domain,
         settings: settings,
@@ -301,5 +301,9 @@ pub fn run_sim_branching(options: Options, py: Python) -> Result<(), cr::Simulat
         parallelizer: Rayon,
         zero_reactions_default: |_| nalgebra::DVector::zeros(1),
     )?;
+    if let Err(e) = options.save_to_toml(storager.get_path()?.join("options.toml")) {
+        eprintln!("Encountered error when saving simulation Options to file:");
+        eprintln!("{e}");
+    }
     Ok(())
 }
