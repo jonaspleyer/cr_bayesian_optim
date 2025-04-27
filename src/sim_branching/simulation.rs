@@ -185,8 +185,8 @@ pub type CellOutput = BTreeMap<u64, SingleIter>;
 
 #[pyfunction]
 pub fn run_sim_branching(
-    options: Options,
     py: Python,
+    options: Options,
 ) -> Result<(CellOutput, std::path::PathBuf), cr::SimulationError> {
     use cr::*;
 
