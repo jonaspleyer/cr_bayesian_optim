@@ -1,4 +1,10 @@
-from .cr_bayesian_optim import Options, load_results, run_sim_branching
+from .cr_bayesian_optim import (
+    Options,
+    load_results,
+    load_results_at_iteration,
+    get_all_iterations,
+    run_sim_branching,
+)
 from pathlib import Path
 from glob import glob
 import numpy as np
@@ -23,6 +29,18 @@ def load_or_compute_full(options):
         print("Running Simulation")
         cells, out_path = run_sim_branching(options)
         return cells, out_path
+
+
+def load_or_compute_last_iter(options):
+    out_path = check_exists(options)
+    if out_path is not None:
+        last_iter = get_all_iterations(out_path)[-1]
+        return load_results_at_iteration(out_path, last_iter), out_path
+    else:
+        print("Running Simulation")
+        cells, out_path = run_sim_branching(options)
+        last_iter = sorted(cells.keys())[-1]
+        return cells[last_iter], out_path
 
 
 def calculate_discretization(

@@ -6,18 +6,6 @@ from tqdm import tqdm
 import scipy as sp
 
 
-def load_or_compute_last_iter(options):
-    out_path = crb.sim_branching.check_exists(options)
-    if out_path is not None:
-        last_iter = crb.get_all_iterations(out_path)[-1]
-        return crb.load_results_at_iteration(out_path, last_iter), out_path
-    else:
-        print("Running Simulation")
-        cells, out_path = crb.run_sim_branching(options)
-        last_iter = sorted(cells.keys())[-1]
-        return cells[last_iter], out_path
-
-
 def produce_options():
     options = crb.Options(
         show_progressbar=True, storage_location="out/fractal_dim_multi"
@@ -141,7 +129,7 @@ def fractal_dim_comparison():
     for diffusion_constant in diffusion_constants:
         options.domain.diffusion_constant = diffusion_constant
 
-        cells, out_path = load_or_compute_last_iter(options)
+        cells, out_path = crb.sim_branching.load_or_compute_last_iter(options)
         last_pos = np.array([c[0].mechanics.pos for c in cells.values()])
 
         x, y, popt, _ = crb.sim_branching.calculate_fractal_dim_for_pos(
