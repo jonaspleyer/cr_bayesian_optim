@@ -49,8 +49,10 @@ class TimeParameters:
     def __new__(cls, **kwargs): ...
 
 type CellIdentifier = tuple[int, int]
-type SingleIter = dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
-type CellOutput = dict[int, SingleIter]
+type SingleIterCells = dict[
+    CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]
+]
+type CellOutput = dict[int, SingleIterCells]
 
 class BacteriaBranching:
     mechanics: NewtonDamped2D
@@ -60,8 +62,8 @@ class BacteriaBranching:
     growth_rate: float
 
 def run_sim_branching(options: Options) -> tuple[CellOutput, Path]: ...
-def load_results(path: Path) -> CellOutput: ...
-def load_results_at_iteration(path: Path, iteration: int) -> SingleIter: ...
+def load_cells(path: Path) -> CellOutput: ...
+def load_cells_at_iteration(path: Path, iteration: int) -> SingleIterCells: ...
 def get_all_iterations(path: Path) -> list[int]: ...
 
 # From cellular_raza

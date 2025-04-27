@@ -1,7 +1,7 @@
 use cellular_raza::prelude::{self as cr, StorageInterfaceLoad};
 use pyo3::prelude::*;
 
-use super::{BacteriaBranching, CellOutput, SingleIter};
+use super::{BacteriaBranching, CellOutput, SingleIterCells};
 
 fn cell_storage_for_loading(
     path: &std::path::Path,
@@ -23,7 +23,7 @@ fn cell_storage_for_loading(
 }
 
 #[pyfunction]
-pub fn load_results(path: std::path::PathBuf) -> Result<CellOutput, cr::SimulationError> {
+pub fn load_cells(path: std::path::PathBuf) -> Result<CellOutput, cr::SimulationError> {
     let cells = cell_storage_for_loading(&path)?;
     use cr::StorageInterfaceLoad;
     Ok(cells
@@ -42,10 +42,10 @@ pub fn load_results(path: std::path::PathBuf) -> Result<CellOutput, cr::Simulati
 }
 
 #[pyfunction]
-pub fn load_results_at_iteration(
+pub fn load_cells_at_iteration(
     path: std::path::PathBuf,
     iteration: u64,
-) -> Result<SingleIter, cr::SimulationError> {
+) -> Result<SingleIterCells, cr::SimulationError> {
     let cells = cell_storage_for_loading(&path)?;
     Ok(cells
         .load_all_elements_at_iteration(iteration)?

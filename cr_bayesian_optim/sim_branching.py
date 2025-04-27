@@ -1,7 +1,7 @@
 from .cr_bayesian_optim import (
     Options,
-    load_results,
-    load_results_at_iteration,
+    load_cells,
+    load_cells_at_iteration,
     get_all_iterations,
     run_sim_branching,
 )
@@ -24,7 +24,7 @@ def check_exists(options: Options) -> Path | None:
 def load_or_compute_full(options):
     out_path = check_exists(options)
     if out_path is not None:
-        return load_results(out_path), out_path
+        return load_cells(out_path), out_path
     else:
         print("Running Simulation")
         cells, out_path = run_sim_branching(options)
@@ -35,7 +35,7 @@ def load_or_compute_last_iter(options):
     out_path = check_exists(options)
     if out_path is not None:
         last_iter = get_all_iterations(out_path)[-1]
-        return load_results_at_iteration(out_path, last_iter), out_path
+        return load_cells_at_iteration(out_path, last_iter), out_path
     else:
         print("Running Simulation")
         cells, out_path = run_sim_branching(options)

@@ -6,8 +6,8 @@
 
 from .cr_bayesian_optim import (
     run_sim_branching,
-    load_results,
-    load_results_at_iteration,
+    load_cells,
+    load_cells_at_iteration,
     get_all_iterations,
     Options,
     BacterialParameters,
@@ -19,6 +19,9 @@ from .cr_bayesian_optim import (
 type CellIdentifier = tuple[int, int]
 type CellOutput = dict[
     int, dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
+]
+type SingleIterCells = dict[
+    CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]
 ]
 
 import cr_bayesian_optim.sim_branching as sim_branching
