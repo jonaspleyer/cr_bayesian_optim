@@ -172,6 +172,16 @@ def fractal_dim_main():
             linestyle="--",
             linewidth=1.5,
         )
+        r = np.atan(-a / np.abs(np.log(ymax / ymin)) * np.abs(np.log(xmax / xmin)))
+        r *= 360 / (2 * np.pi)
+        ax.text(
+            np.exp(0.50 * (np.log(xmin) + np.log(xmax))),
+            np.exp(np.log(np.min(y)) + 0.55 * (np.log(np.max(y)) - np.log(np.min(y)))),
+            f"D={diffusion_constant} dim={-a:.3}",
+            verticalalignment="center",
+            horizontalalignment="center",
+            rotation=-r,
+        )
 
     ax.vlines(
         2 * options.bacteria.cell_radius,
@@ -193,7 +203,7 @@ def fractal_dim_main():
     handles, labels = ax.get_legend_handles_labels()
     handles = [handles[0], handles[1], handles[-1]]
     labels = [
-        "D=" + ",".join([str(i) for i in sorted(diffusion_constants)]),
+        "Data",
         labels[1],
         labels[-1],
     ]
