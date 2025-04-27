@@ -98,7 +98,7 @@ pub struct Options {
     #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub time: Py<TimeParameters>,
     /// Show or hide the progress bar during the simulation.
-    #[approx(equal)]
+    #[approx(skip)]
     pub show_progressbar: bool,
     /// Specify how many threads to use for the simulation.
     /// Must be a positive integer value.
@@ -108,7 +108,7 @@ pub struct Options {
     /// returned in memory.
     /// If a path is given, results will be stored there with a timestamp of the beginning of the
     /// simulation.
-    #[approx(equal)]
+    #[approx(skip)]
     pub storage_location: Option<std::path::PathBuf>,
 }
 
