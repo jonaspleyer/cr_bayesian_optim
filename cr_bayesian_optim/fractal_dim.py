@@ -120,14 +120,71 @@ def produce_options():
     return options
 
 
-def calculate_fractal_dim_over_time(cells: crb.CellOutput, options: crb.Options):
-    iterations = sorted(cells.keys())
-    dims = []
-    for i in iterations:
+def fractal_dim_over_time():
+    options = produce_options()
+
+    cells, _ = load_or_compute_full(options)
+
+    iterations = sorted(cells.keys())[::4]
+    colony_diam = []
+    dims_mean = []
+    dims_std = []
+    for i in tqdm(iterations, desc="Calculating dim(t)"):
         pos = np.array([c[0].mechanics.pos for c in cells[i].values()])
 
-        x, popt, pcov, count_boxes = calculate_fractal_dim_for_pos(pos, options, None)
-        dims.append(popt[0])
+        # Calculate Diameter of colony with convex hull
+        hull = sp.spatial.ConvexHull(pos)
+        hull_points = pos[hull.vertices]
+
+        diam = 0
+        n_points = int(np.ceil(len(hull_points) / 2))
+        for p in hull_points[:n_points]:
+            d = np.linalg.norm(hull_points - p, axis=1)
+            diam = max(diam, np.max(d))
+        colony_diam.append(diam)
+
+        _, _, popt, pcov = calculate_fractal_dim_for_pos(pos, options, None)
+        dims_mean.append(-popt[0])
+        dims_std.append(pcov[0, 0] ** 0.5)
+
+    t = np.array(iterations) * options.time.dt / 60
+    y1 = np.array(dims_mean)
+    y1_err = np.array(dims_std)
+    y2 = np.array(colony_diam) / 1000
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    # Introduce new y-axis for colony size
+    ax2 = ax.twinx()
+    ax2.set_ylabel("Diameter [mm]")
+    ax2.plot(t, y2, label="Colony Size", linestyle="--", color=COLOR5)
+
+    # Plot Fractal Dimension
+    ax.plot(t, y1, label="dim", color=COLOR1)
+    ax.fill_between(t, y1 - y1_err, y1 + y1_err, color=COLOR3, alpha=0.3)
+    ax.set_ylabel("Fractal Dimension")
+    ax.set_xlabel("Time [min]")
+
+    handles1, labels1 = ax.get_legend_handles_labels()
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    handles = [handles1[0], handles2[0]]
+    labels = [labels1[0], labels2[0]]
+    ax.legend(
+        handles,
+        labels,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.10),
+        ncol=4,
+        frameon=False,
+    )
+
+    ax.grid(True, which="major", linestyle="-", linewidth=0.75, alpha=0.25)
+    ax.minorticks_on()
+    ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
+    ax.set_axisbelow(True)
+    fig.tight_layout()
+    fig.savefig(options.storage_location / "fractal-dim-over-time.pdf")
+    plt.close(fig)
 
 
 def calculate_fractal_dim_for_pos(
@@ -246,3 +303,4 @@ def fractal_dim_comparison():
 
 def fractal_dim_main():
     fractal_dim_comparison()
+    fractal_dim_over_time()
