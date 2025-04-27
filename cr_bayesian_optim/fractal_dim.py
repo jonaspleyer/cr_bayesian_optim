@@ -152,7 +152,7 @@ def calculate_fractal_dim_for_pos(
     return x, count_boxes, popt, pcov
 
 
-def fractal_dim_main():
+def fractal_dim_comparison():
     # Initialize Graph
     fig, ax = plt.subplots(figsize=(8, 8))
 
@@ -161,19 +161,14 @@ def fractal_dim_main():
     ymin = np.inf
     ymax = -np.inf
 
-    options = crb.Options(
-        show_progressbar=True, storage_location="out/fractal_dim_multi"
-    )
-    options.time.t_max = 2000
-    options.domain.domain_size = 2000
-    options.time.dt = 0.3
+    options = produce_options()
     diffusion_constants = [80, 5, 0.5]
 
     results = []
     for diffusion_constant in diffusion_constants:
         options.domain.diffusion_constant = diffusion_constant
 
-        cells, out_path = load_or_compute(options)
+        cells, out_path = load_or_compute_last_iter(options)
         last_pos = np.array([c[0].mechanics.pos for c in cells.values()])
 
         x, y, popt, _ = calculate_fractal_dim_for_pos(last_pos, options, out_path)
@@ -245,4 +240,9 @@ def fractal_dim_main():
     ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
     ax.set_axisbelow(True)
     fig.tight_layout()
-    fig.savefig(options.storage_location / "fractal-dimension.pdf")
+    fig.savefig(options.storage_location / "fractal-dim-box-size-scaling.pdf")
+    plt.close(fig)
+
+
+def fractal_dim_main():
+    fractal_dim_comparison()
