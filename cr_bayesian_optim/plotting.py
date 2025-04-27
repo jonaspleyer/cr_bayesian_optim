@@ -1,4 +1,3 @@
-import json
 from .cr_bayesian_optim import (
     load_cells_at_iteration,
     get_all_iterations,
@@ -6,9 +5,7 @@ from .cr_bayesian_optim import (
 )
 
 from pathlib import Path
-from glob import glob
 import os
-import pandas as pd
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -24,76 +21,22 @@ COLOR4 = "#ffbe4f"
 COLOR5 = "#e8702a"
 
 
-def get_last_output_path(search_dir: Path | None = Path("out")) -> Path:
-    """
-    Parameters
-    ----------
-    search_dir: Path
-        Directory to search for results. Defaults to "out".
-
-    Returns
-    -------
-    output_path: Path
-        Most recent folder in the given search_dir.
-    """
-    return Path(sorted(list(glob(str(search_dir) + "/*")))[-1])
+def my_cmap():
+    cmap = matplotlib.colormaps["viridis"]
+    colors = cmap(np.arange(cmap.N))
+    colors[:, -1] = np.linspace(1, 0, cmap.N)
+    cmap = matplotlib.colors.ListedColormap(colors)
+    return cmap
 
 
-def _get_all_iteration_files(output_path: Path) -> list[Path]:
-    return [Path(p) for p in sorted(glob(str(output_path) + "/cells/json/*"))]
-
-
-def _iteration_to_file(iteration: int, output_path: Path, cs: str = "cells") -> Path:
-    return output_path / "{}/json/{:020}".format(cs, iteration)
-
-
-def get_all_iterations(output_path: Path) -> list[int]:
-    iterations_files = _get_all_iteration_files(output_path)
-    return [int(os.path.basename(it)) for it in iterations_files]
-
-
-def load_cells_at_iteration(
-    iteration: int,
-    output_path: Path,
-):
-    iteration_file = _iteration_to_file(iteration, output_path, "cells")
-    data = []
-    for filename in glob(str(iteration_file) + "/*"):
-        file = open(filename)
-        di = json.load(file)["data"]
-        data.extend([b["element"][0] for b in di])
-    df = pd.json_normalize(data)
-    for key in [
-        "cell.mechanics.pos",
-        "cell.mechanics.vel",
-    ]:
-        df[key] = df[key].apply(lambda x: np.array(x, dtype=float))
-    return df
-
-
-def load_subdomains_at_iteration(iteration: int, output_path: Path) -> pd.DataFrame:
-    iteration_file = _iteration_to_file(iteration, output_path, "subdomains")
-    data = []
-    for filename in glob(str(iteration_file) + "/*"):
-        file = open(filename)
-        di = json.load(file)["element"]
-        data.append(di)
-    df = pd.json_normalize(data)
-    for key in [
-        "subdomain.domain_min",
-        "subdomain.domain_max",
-        "subdomain.min",
-        "subdomain.max",
-        "subdomain.dx",
-        "subdomain.voxels",
-        "reactions_min",
-        # "reactions_max",
-        "reactions_dx",
-        "extracellular.data",
-        "ownership_array.data",
-    ]:
-        df[key] = df[key].apply(lambda x: np.array(x, dtype=float))
-    return df
+def set_rcparams():
+    matplotlib.rcParams["axes.facecolor"] = (0, 0, 0, 0)
+    matplotlib.rcParams["figure.facecolor"] = (0, 0, 0, 0)
+    matplotlib.rcParams["figure.edgecolor"] = (0, 0, 0, 0)
+    matplotlib.rcParams["savefig.facecolor"] = (0, 0, 0, 0)
+    matplotlib.rcParams["savefig.edgecolor"] = (0, 0, 0, 0)
+    matplotlib.rcParams["legend.facecolor"] = (0, 0, 0, 0)
+    matplotlib.rcParams["legend.framealpha"] = None
 
 
 def plot_iteration(
@@ -104,40 +47,50 @@ def plot_iteration(
     save_figure: bool = True,
     figsize: int = 32,
 ) -> matplotlib.figure.Figure | None:
-    dfc = load_cells_at_iteration(iteration, output_path)
-    dfs = load_subdomains_at_iteration(iteration, output_path)
+    set_rcparams()
+
+    cells = load_cells_at_iteration(output_path, iteration)
+    subdomains = load_subdomains_at_iteration(output_path, iteration)
 
     # Set size of the image
-    domain_min = dfs["subdomain.domain_min"][0]
-    domain_max = dfs["subdomain.domain_max"][0]
+    sbd0 = list(subdomains.values())[0]
+    domain_min: tuple[float, float] = sbd0["subdomain"]["domain_min"]
+    domain_max: tuple[float, float] = sbd0["subdomain"]["domain_max"]
     fig, ax = plt.subplots(figsize=(figsize, figsize))
-    ax.set_xlim([domain_min[0], domain_max[0]])
-    ax.set_ylim([domain_min[1], domain_max[1]])
+    ax.set_xlim((domain_min[0], domain_max[0]))
+    ax.set_ylim((domain_min[1], domain_max[1]))
 
     # Plot background
-    max_size = np.max([dfsi["index_max"] for _, dfsi in dfs.iterrows()], axis=0)
+    # max_size = np.max([dfsi["index_max"] for _, dfsi in dfs.iterrows()], axis=0)
+    max_size = np.max([sbd["index_max"] for sbd in subdomains.values()], axis=0)
     all_values = np.zeros(max_size)
-    for n_sub, dfsi in dfs.iterrows():
-        values = dfsi["extracellular.data"].reshape(dfsi["extracellular.dim"])[:, :, 0]
-        filt = dfsi["ownership_array.data"].reshape(dfsi["ownership_array.dim"])
+    for sbd in subdomains.values():
+        values = np.array(sbd["extracellular"]["data"]).reshape(
+            sbd["extracellular"]["dim"]
+        )[:, :, 0]
+        filt = np.array(sbd["ownership_array"]["data"]).reshape(
+            sbd["ownership_array"]["dim"]
+        )
         filt = filt[1:-1, 1:-1]
 
-        index_min = np.array(dfsi["index_min"])
+        index_min = np.array(sbd["index_min"])
         slow = index_min
         shigh = index_min + np.array(values.shape)
         all_values[slow[0] : shigh[0], slow[1] : shigh[1]] += values * filt
+
     ax.imshow(
         all_values.T,
         vmin=extra_bounds[0],
         vmax=extra_bounds[1],
         extent=(domain_min[0], domain_max[0], domain_min[1], domain_max[1]),
         origin="lower",
+        cmap=my_cmap(),
     )
 
     # Plot cells
-    points = np.array([p for p in dfc["cell.mechanics.pos"]])
-    radii = np.array([r for r in dfc["cell.interaction.radius"]])
-    radii_div = np.array([r for r in dfc["cell.division_radius"]])
+    points = np.array([c[0].mechanics.pos for c in cells.values()])
+    radii = np.array([c[0].interaction.radius for c in cells.values()])
+    radii_div = np.array([c[0].division_radius for c in cells.values()])
     s = np.clip(
         (radii / radii_div - intra_bounds[0]) / (intra_bounds[1] - intra_bounds[0]),
         0,
@@ -214,9 +167,7 @@ def plot_all_iterations(
     )
 
 
-def generate_movie(opath: Path | None = None, play_movie: bool = True):
-    if opath is None:
-        opath = get_last_output_path(opath)
+def generate_movie(opath: Path, play_movie: bool = True):
     bashcmd = f"ffmpeg\
         -v quiet\
         -stats\
