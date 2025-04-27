@@ -1,7 +1,7 @@
 """
 >>> import cr_bayesian_optim as crb
->>> a = crb.sum_as_string(1, 2)
->>> assert a == "3"
+>>> options = crb.Options()
+>>> cells, out_path = crb.run_sim_branching(options)
 """
 
 from .cr_bayesian_optim import (
