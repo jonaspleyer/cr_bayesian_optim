@@ -22,6 +22,14 @@ def check_exists(options: Options) -> Path | None:
 
 
 def load_or_compute_full(options):
+    """
+    Obtains a result for a given combination of options by either loading from existing files or
+    performing a fully new numerical simulation.
+
+    .. seealso::
+        The :meth:`load_or_compute_last_iter` function is cheaper when only loading the last
+        iteration.
+    """
     out_path = check_exists(options)
     if out_path is not None:
         return load_cells(out_path), out_path
