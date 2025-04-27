@@ -80,15 +80,19 @@ def plot_discretizations(last_pos, n_voxels_list, options, out_path: Path):
         img.save(out_path / f"discretization-nvoxels-{n_voxels:06}.png")
 
 
-def load_or_compute(options):
+def check_exists(options: crb.Options) -> Path | None:
     for file in glob(str(options.storage_location / "**/options.toml")):
         file_path = Path(file)
         opt_loaded = crb.Options.load_from_toml(file_path)
         if opt_loaded == options:
-            print("Reading Files")
-            out_path = file_path.parent
-            last_iter = crb.get_all_iterations(out_path)[-1]
-            return crb.load_results_at_iteration(out_path, last_iter), out_path
+            return file_path.parent
+
+
+def load_or_compute_last_iter(options):
+    out_path = check_exists(options)
+    if out_path is not None:
+        last_iter = crb.get_all_iterations(out_path)[-1]
+        return crb.load_results_at_iteration(out_path, last_iter), out_path
     else:
         print("Running Simulation")
         cells, out_path = crb.run_sim_branching(options)
