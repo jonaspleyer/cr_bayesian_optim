@@ -21,8 +21,7 @@ type CellOutput = dict[
     int, dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
 ]
 
-from .plotting import *
-
 import cr_bayesian_optim.sim_branching as sim_branching
+import cr_bayesian_optim.plotting as plotting
 
 from .fractal_dim import fractal_dim_main
