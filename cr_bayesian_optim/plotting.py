@@ -10,6 +10,13 @@ import tqdm
 import multiprocessing as mp
 import itertools
 
+# Define colors
+COLOR1 = "#0c457d"
+COLOR2 = "#0ea7b5"
+COLOR3 = "#6bd2db"
+COLOR4 = "#ffbe4f"
+COLOR5 = "#e8702a"
+
 
 def get_last_output_path(search_dir: Path | None = Path("out")) -> Path:
     """

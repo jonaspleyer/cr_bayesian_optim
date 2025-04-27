@@ -23,4 +23,6 @@ type CellOutput = dict[
 
 from .plotting import *
 
+import cr_bayesian_optim.sim_branching as sim_branching
+
 from .fractal_dim import fractal_dim_main
