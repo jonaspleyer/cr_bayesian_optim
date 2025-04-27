@@ -10,6 +10,7 @@ fn cr_bayesian_optim(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(run_sim_branching, m)?)?;
     m.add_function(wrap_pyfunction!(load_cells, m)?)?;
     m.add_function(wrap_pyfunction!(load_cells_at_iteration, m)?)?;
+    m.add_function(wrap_pyfunction!(load_subdomains_at_iteration, m)?)?;
     m.add_function(wrap_pyfunction!(get_all_iterations, m)?)?;
     m.add_class::<Options>()?;
     m.add_class::<BacterialParameters>()?;
@@ -19,5 +20,6 @@ fn cr_bayesian_optim(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<cr::NewtonDamped2D>()?;
     m.add_class::<cr::MorsePotential>()?;
     m.add_class::<cr::CellIdentifier>()?;
+    m.add_class::<cr::SubDomainPlainIndex>()?;
     Ok(())
 }

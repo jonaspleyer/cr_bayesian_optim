@@ -8,6 +8,7 @@ from .cr_bayesian_optim import (
     run_sim_branching,
     load_cells,
     load_cells_at_iteration,
+    load_subdomains_at_iteration,
     get_all_iterations,
     Options,
     BacterialParameters,
@@ -23,6 +24,7 @@ type CellOutput = dict[
 type SingleIterCells = dict[
     CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]
 ]
+type SingleIterSubDomains = dict[int, dict]
 
 import cr_bayesian_optim.sim_branching as sim_branching
 import cr_bayesian_optim.plotting as plotting

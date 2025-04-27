@@ -180,8 +180,10 @@ impl PartialEq for Options {
     }
 }
 
-pub type SingleIter = BTreeMap<cr::CellIdentifier, (BacteriaBranching, Option<cr::CellIdentifier>)>;
-pub type CellOutput = BTreeMap<u64, SingleIter>;
+pub type SingleIterCells =
+    BTreeMap<cr::CellIdentifier, (BacteriaBranching, Option<cr::CellIdentifier>)>;
+pub type SingleIterSubDomains<'a> = BTreeMap<cr::SubDomainPlainIndex, Bound<'a, PyAny>>;
+pub type CellOutput = BTreeMap<u64, SingleIterCells>;
 
 #[pyfunction]
 pub fn run_sim_branching(

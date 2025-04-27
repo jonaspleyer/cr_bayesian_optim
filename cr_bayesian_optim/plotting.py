@@ -2,6 +2,7 @@ import json
 from .cr_bayesian_optim import (
     load_cells_at_iteration,
     get_all_iterations,
+    load_subdomains_at_iteration,
 )
 
 from pathlib import Path
