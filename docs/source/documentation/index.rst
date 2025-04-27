@@ -9,3 +9,4 @@ Documentation
 
    Plotting <plotting>
    Branching Simulation <sim_branching>
+   Optimization <optimization>

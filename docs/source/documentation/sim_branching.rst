@@ -1,6 +1,13 @@
 sim_branching
 -------------
 
+.. automodule:: cr_bayesian_optim.sim_branching
+    :members:
+    :member-order: groupwise
+    :inherited-members:
+    :show-inheritance:
+    :undoc-members:
+
 .. automodule:: cr_bayesian_optim.cr_bayesian_optim
     :members:
     :member-order: groupwise
