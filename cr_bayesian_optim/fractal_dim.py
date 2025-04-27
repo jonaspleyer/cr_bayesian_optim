@@ -169,8 +169,8 @@ def fractal_dim_main():
             np.exp(a * np.log(x) + b),
             label="LR",
             color=COLOR5,
-            linestyle="--",
-            linewidth=1.5,
+            linestyle=(0, (6, 4)),
+            linewidth=2,
         )
         r = np.atan(-a / np.abs(np.log(ymax / ymin)) * np.abs(np.log(xmax / xmin)))
         r *= 360 / (2 * np.pi)
