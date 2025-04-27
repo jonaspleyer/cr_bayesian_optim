@@ -88,6 +88,16 @@ def check_exists(options: crb.Options) -> Path | None:
             return file_path.parent
 
 
+def load_or_compute_full(options):
+    out_path = check_exists(options)
+    if out_path is not None:
+        return crb.load_results(out_path), out_path
+    else:
+        print("Running Simulation")
+        cells, out_path = crb.run_sim_branching(options)
+        return cells, out_path
+
+
 def load_or_compute_last_iter(options):
     out_path = check_exists(options)
     if out_path is not None:
