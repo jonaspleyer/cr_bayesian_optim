@@ -88,16 +88,26 @@ where
 #[derive(Clone, Serialize, Deserialize, AbsDiffEq)]
 #[approx(epsilon_type = f64)]
 pub struct Options {
+    /// Holds bacteria parameters. See :class:`BacterialParameters`.
     #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub bacteria: Py<BacterialParameters>,
+    /// Holds domain parameters. See :class:`DomainParameters`.
     #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub domain: Py<DomainParameters>,
+    /// Holds time parameters. See :class:`TimeParameters`.
     #[approx(map = |b| Python::with_gil(|py| Some(get_inner(b, py))))]
     pub time: Py<TimeParameters>,
+    /// Show or hide the progress bar during the simulation.
     #[approx(equal)]
     pub show_progressbar: bool,
+    /// Specify how many threads to use for the simulation.
+    /// Must be a positive integer value.
     #[approx(equal)]
     pub n_threads: NonZeroUsize,
+    /// If this variable is set to `None`, no output will be produced and results will only be
+    /// returned in memory.
+    /// If a path is given, results will be stored there with a timestamp of the beginning of the
+    /// simulation.
     #[approx(equal)]
     pub storage_location: Option<std::path::PathBuf>,
 }
@@ -185,6 +195,12 @@ pub type SingleIterCells =
 pub type SingleIterSubDomains<'a> = BTreeMap<cr::SubDomainPlainIndex, Bound<'a, PyAny>>;
 pub type CellOutput = BTreeMap<u64, SingleIterCells>;
 
+/// Performs a full numerical simulation with the given :class:`Options`.
+///
+/// .. warning::
+///     Although this function is fully working it is highly recommended to use the
+///     :meth:`load_or_compute_full` function instead which will check first if a result with
+///     the given options has already been produced and thus reuse these existing results.
 #[pyfunction]
 pub fn run_sim_branching(
     py: Python,

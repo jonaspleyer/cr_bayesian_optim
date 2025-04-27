@@ -14,6 +14,22 @@ import numpy as np
 
 
 def rhs_fractal_dim(options: Options) -> tuple[float, float]:
+    """
+    Parameters
+    ----------
+    options: Options
+        Options to run/load the branching simulation.
+        Be aware that the `storage_location` should be set to `None`
+        since otherwise, many disk space would be used (and probably
+        not reused if running optimization again).
+
+    Returns
+    -------
+    fractal_dim: float
+        The fractal dimension of the last iteration.
+    fractal_dim_err: float
+        The uncertainty of the fractal dimension.
+    """
     cells, _ = load_or_compute_last_iter(options.storage_location)
     pos = np.array([c[0].mechanics.pos for c in cells.values()], dtype=float)
 

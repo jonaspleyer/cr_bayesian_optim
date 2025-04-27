@@ -34,6 +34,12 @@ fn subdomain_storage_for_loading(
     Ok(cr::StorageManager::open_or_create(storage_builder, 0)?)
 }
 
+/// Loads all cells for all iterations from a given path.
+///
+/// .. caution::
+///     Notice that this input expects a path containing the simulation results directly.
+///     This means for practical purposes that a date signature such as will have to be added (i.e.
+///     `path=out/2025-04-26-T18-06-43`).
 #[pyfunction]
 pub fn load_cells(path: std::path::PathBuf) -> Result<CellOutput, cr::SimulationError> {
     let cells = cell_storage_for_loading(&path)?;
@@ -53,6 +59,9 @@ pub fn load_cells(path: std::path::PathBuf) -> Result<CellOutput, cr::Simulation
         .collect())
 }
 
+/// Loads all cells from a given path for a specific iteration.
+///
+/// The same comment from :meth:`load_cells` applies.
 #[pyfunction]
 pub fn load_cells_at_iteration(
     path: std::path::PathBuf,
