@@ -144,6 +144,8 @@ def fractal_dim_main():
     options.domain.domain_size = 2000
     options.time.dt = 0.3
     diffusion_constants = [80, 5, 0.5]
+
+    results = []
     for diffusion_constant in diffusion_constants:
         options.domain.diffusion_constant = diffusion_constant
 
@@ -151,12 +153,15 @@ def fractal_dim_main():
         last_pos = np.array([c[0].mechanics.pos for c in cells.values()])
 
         x, y, popt, _ = calculate_fractal_dim_for_pos(last_pos, options, out_path)
-        ax.plot(x, y, color=COLOR1, linestyle="-", label=f"D={diffusion_constant:2}")
 
+        results.append((x, y, popt))
         xmin = min(np.min(x), xmin)
         xmax = max(np.max(x), xmax)
         ymin = min(np.min(y), ymin)
         ymax = max(np.max(y), ymax)
+
+    for (x, y, popt), diffusion_constant in zip(results, diffusion_constants):
+        ax.plot(x, y, color=COLOR1, linestyle="-", label=f"D={diffusion_constant:2}")
 
         a, b = popt
         ax.plot(
