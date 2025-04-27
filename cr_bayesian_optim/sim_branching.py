@@ -89,7 +89,7 @@ def plot_discretizations(last_pos, n_voxels_list, options, out_path: Path):
     max_overall = np.max([np.max(c[1]) for c in counts])
     for n_voxels, y in counts:
         img = Image.fromarray(
-            np.round(y / max_overall * 125 + (y > 0) * 130).astype(np.uint8)
+            np.round(y / max_overall * 125 + (y > 0) * 130).astype(np.uint8).T[::-1]
         )
         img.save(out_path / f"discretization-nvoxels-{n_voxels:06}.png")
 
