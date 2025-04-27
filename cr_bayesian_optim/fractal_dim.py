@@ -110,6 +110,16 @@ def load_or_compute_last_iter(options):
         return cells[last_iter], out_path
 
 
+def produce_options():
+    options = crb.Options(
+        show_progressbar=True, storage_location="out/fractal_dim_multi"
+    )
+    options.time.t_max = 2000
+    options.domain.domain_size = 2000
+    options.time.dt = 0.3
+    return options
+
+
 def calculate_fractal_dim_over_time(cells: crb.CellOutput, options: crb.Options):
     iterations = sorted(cells.keys())
     dims = []
