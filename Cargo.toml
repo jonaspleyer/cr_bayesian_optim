@@ -16,7 +16,7 @@ approxim = "0.6.5"
 cellular_raza = { git = "https://github.com/jonaspleyer/cellular_raza", features = [ "pyo3", "approx" ] }
 nalgebra = "0.33.2"
 num = "0.4"
-pyo3 = "0.24"
+pyo3 = { version = "0.24", features = ["serde"] }
 pythonize = "0.24.0"
 rand = "0.9"
 rand_chacha = "0.9"
