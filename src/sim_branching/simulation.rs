@@ -99,7 +99,7 @@ pub struct Options {
     #[approx(equal)]
     pub n_threads: NonZeroUsize,
     #[approx(equal)]
-    pub storage_location: std::path::PathBuf,
+    pub storage_location: Option<std::path::PathBuf>,
 }
 
 #[pymethods]
@@ -115,7 +115,7 @@ impl Options {
                 time: Py::new(py, <TimeParameters as Default>::default())?,
                 show_progressbar: false,
                 n_threads: 1.try_into().unwrap(),
-                storage_location: "out".into(),
+                storage_location: Some("out".into()),
             },
         )?;
         if let Some(kwds) = kwargs {
@@ -282,9 +282,12 @@ pub fn run_sim_branching(
         initial_value: ReactionVector::from(vec![initial_concentration]),
     };
 
-    let storage = StorageBuilder::new()
-        .priority([StorageOption::Memory, StorageOption::SerdeJson])
-        .location(&options.storage_location);
+    let storage = match &options.storage_location {
+        Some(loc) => StorageBuilder::new()
+            .priority([StorageOption::Memory, StorageOption::SerdeJson])
+            .location(&loc),
+        None => StorageBuilder::new().priority([StorageOption::Memory]),
+    };
     let time = FixedStepsize::from_partial_save_freq(0.0, dt, t_max, save_interval)?;
     let settings = Settings {
         n_threads,
