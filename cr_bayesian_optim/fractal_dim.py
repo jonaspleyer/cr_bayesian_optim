@@ -328,6 +328,7 @@ def fractal_dim_vs_diffusion_constant():
         frameon=False,
     )
 
+    fig.tight_layout()
     fig.savefig(options.storage_location / "fractal-dim-vs-diffusion-constant.pdf")
     plt.close(fig)
 
