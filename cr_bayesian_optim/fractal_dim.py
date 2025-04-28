@@ -1,9 +1,11 @@
 import numpy as np
 import cr_bayesian_optim as crb
-from cr_bayesian_optim.plotting import COLOR1, COLOR2, COLOR3, COLOR5
+from cr_bayesian_optim.plotting import COLOR1, COLOR2, COLOR3, COLOR4, COLOR5
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import scipy as sp
+from glob import glob
+import os
 
 
 def produce_options():
@@ -213,6 +215,123 @@ def fractal_dim_comparison():
     plt.close(fig)
 
 
+def runtime_plot():
+    options = produce_options()
+    diffusion_constants = [80, 5, 0.5]
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    for diffusion_constant in diffusion_constants:
+        options.domain.diffusion_constant = diffusion_constant
+        cells, out_path = crb.sim_branching.load_or_compute_full(options)
+
+        files = sorted(glob(str(out_path / "cells/json/*/*.json")))
+        times = np.array([os.path.getmtime(f) for f in files])
+
+        t = np.array(list(cells.keys())) * options.time.dt / 60
+        dt = times - times[0]
+
+        # Plot Data
+        ax.plot(t, dt, color=crb.plotting.COLOR1, label="Data")
+
+        ind = int(np.round(0.5 * len(t)))
+        tfit = t[ind:]
+        popt, pcov = sp.optimize.curve_fit(lambda t, a, b: a * t + b, tfit, dt[ind:])
+
+        a, b = popt
+        # da = pcov[0, 0] ** 0.5
+        # db = pcov[1, 1] ** 0.5
+        yfit = a * tfit + b
+        # yfit_low = (a - da) * tfit + (b - db)
+        # yfit_high = (a + da) * tfit + (b + db)
+
+        # Plot Fit
+        ax.plot(
+            tfit,
+            yfit,
+            label="LR",
+            color=COLOR5,
+            linestyle=(0, (6, 4)),
+            linewidth=2,
+        )
+        ax.set_xlim(np.min(t).astype(float), np.max(t).astype(float))
+        # ax.fill_between(tfit, yfit_low, yfit_high, color=COLOR4, alpha=0.3)
+
+    ax.set_ylabel("Runtime [s]")
+    ax.set_xlabel("Simulation Time [min]")
+    ax.grid(True, which="major", linestyle="-", linewidth=0.75, alpha=0.25)
+    ax.minorticks_on()
+    ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
+    ax.set_axisbelow(True)
+
+    ax.legend()
+
+    handles, labels = ax.get_legend_handles_labels()
+    handles = [handles[0], handles[1]]
+    labels = [labels[0], labels[1]]
+
+    ax.legend(
+        handles,
+        labels,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.10),
+        ncol=4,
+        frameon=False,
+    )
+
+    fig.tight_layout()
+    fig.savefig(options.storage_location / "runtime-sim-branching.pdf")
+    plt.close(fig)
+
+
+def fractal_dim_vs_diffusion_constant():
+    options = produce_options()
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    data = []
+    data_err = []
+    diffusion_constants = [0.1, 0.5, 2.0, 5.0, 80.0]
+    for diffusion_constant in diffusion_constants:
+        options.domain.diffusion_constant = diffusion_constant
+
+        cells, out_path = crb.sim_branching.load_or_compute_last_iter(options)
+        pos = np.array([c[0].mechanics.pos for c in cells.values()])
+        _, _, popt, pcov = crb.sim_branching.calculate_fractal_dim_for_pos(pos, options)
+        dim = popt[0]
+        ddim = pcov[0, 0] ** 0.5
+
+        data.append(-dim)
+        data_err.append(ddim)
+
+    ax.plot(diffusion_constants, data, color=COLOR1, label="dim")
+    ax.fill_between(
+        diffusion_constants,
+        np.array(data) - np.array(data_err),
+        np.array(data) + np.array(data_err),
+        color=COLOR2,
+        alpha=0.3,
+    )
+
+    ax.set_xlim(np.min(diffusion_constants), np.max(diffusion_constants))
+    ax.set_xlabel("Diffusion Constant")
+    ax.set_ylabel("Fractal Dimension")
+    ax.set_xscale("log")
+    ax.grid(True, which="major", linestyle="-", linewidth=0.75, alpha=0.25)
+    ax.minorticks_on()
+    ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
+    ax.set_axisbelow(True)
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, 1.10),
+        ncol=4,
+        frameon=False,
+    )
+
+    fig.savefig(options.storage_location / "fractal-dim-vs-diffusion-constant.pdf")
+    plt.close(fig)
+
+
 def fractal_dim_main():
     plt.rcParams.update(
         {
@@ -228,3 +347,5 @@ def fractal_dim_main():
     )
     fractal_dim_comparison()
     fractal_dim_over_time()
+    runtime_plot()
+    fractal_dim_vs_diffusion_constant()
