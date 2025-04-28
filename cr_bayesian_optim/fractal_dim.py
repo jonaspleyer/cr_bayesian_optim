@@ -22,7 +22,6 @@ def fractal_dim_over_time():
     t = []
     y1 = []
     y1_err = []
-    y2 = []
 
     diffusion_constants = [80, 5, 0.5]
     for diffusion_constant in diffusion_constants:
@@ -30,22 +29,10 @@ def fractal_dim_over_time():
         cells, _ = crb.sim_branching.load_or_compute_full(options)
 
         iterations = sorted(cells.keys())
-        colony_diam = []
         dims_mean = []
         dims_std = []
         for i in tqdm(iterations, desc="Calculating dim(t)"):
             pos = np.array([c[0].mechanics.pos for c in cells[i].values()])
-
-            # Calculate Diameter of colony with convex hull
-            hull = sp.spatial.ConvexHull(pos)
-            hull_points = pos[hull.vertices]
-
-            diam = 0
-            n_points = int(np.ceil(len(hull_points) / 2))
-            for p in hull_points[:n_points]:
-                d = np.linalg.norm(hull_points - p, axis=1)
-                diam = max(diam, np.max(d))
-            colony_diam.append(diam)
 
             _, _, popt, pcov = crb.sim_branching.calculate_fractal_dim_for_pos(
                 pos, options, None
@@ -56,18 +43,8 @@ def fractal_dim_over_time():
         t.append(np.array(iterations) * options.time.dt / 60)
         y1.append(np.array(dims_mean))
         y1_err.append(np.array(dims_std))
-        y2.append(np.array(colony_diam) / 1000)
 
     fig, ax = plt.subplots(figsize=(8, 8))
-
-    # Introduce new y-axis for colony size
-    ax2 = ax.twinx()
-    ax2.set_ylabel("Diameter [mm]")
-    ax2.set_yscale("log")
-    for i in range(len(t)):
-        ax2.plot(
-            t[i], y2[i], label="Colony Size", linestyle="--", color=COLOR5, linewidth=2
-        )
 
     # Plot Fractal Dimension
     for i in range(len(t)):
@@ -75,26 +52,55 @@ def fractal_dim_over_time():
         ax.fill_between(
             t[i], y1[i] - y1_err[i], y1[i] + y1_err[i], color=COLOR3, alpha=0.3
         )
-        ind = int(np.round(0.2 * len(t[i])))
+
+        # Plot Fit
+        popt, pcov = sp.optimize.curve_fit(
+            lambda t, a, b, c: (a - c) * (1 - np.exp(-b * t)) + c,
+            t[i],
+            y1[i],
+            sigma=y1_err[i],
+            absolute_sigma=True,
+        )
+
+        a, b, c = popt
+        yfit = (a - c) * (1 - np.exp(-b * t[i])) + c
+        ax.plot(
+            t[i],
+            yfit,
+            label="BG",
+            color=COLOR5,
+            linestyle="--",
+            linewidth=2,
+        )
+
+        ind = int(np.round(0.3 * len(t[i])))
         angle = (
             360
             / (2 * np.pi)
             * np.atan(
-                (y1[i][ind + 1] - y1[i][ind])
+                (yfit[ind + 1] - yfit[ind])
                 / (np.max(y1) - np.min(y1))
                 / (t[i][ind + 1] - t[i][ind])
                 * (np.max(t) - np.min(t))
             )
         )
-        y = y1[i][ind] + 0.1 * (np.max(y1[i]) - np.min(y1[i]))
-        ax.text(t[i][ind], y, f"D={diffusion_constants[i]}", rotation=angle)
+        y = yfit[ind] + 0.15 * (np.max(yfit) - np.min(yfit))
+        ax.text(
+            t[i][ind],
+            y,
+            f"D={diffusion_constants[i]} dim$\\rightarrow${a:.4}",
+            rotation=angle,
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+
+    ax.set_xlim(np.min(t[0]), np.max(t[0]))
     ax.set_ylabel("Fractal Dimension")
     ax.set_xlabel("Time [min]")
 
-    handles1, labels1 = ax.get_legend_handles_labels()
-    handles2, labels2 = ax2.get_legend_handles_labels()
-    handles = [handles1[0], handles2[0]]
-    labels = [labels1[0], labels2[0]]
+    handles, labels = ax.get_legend_handles_labels()
+    handles = [handles[0], handles[1]]
+    labels = [labels[0], labels[1]]
     ax.legend(
         handles,
         labels,
@@ -159,7 +165,7 @@ def fractal_dim_comparison():
         ax.text(
             np.exp(0.50 * (np.log(xmin) + np.log(xmax))),
             np.exp(np.log(np.min(y)) + 0.55 * (np.log(np.max(y)) - np.log(np.min(y)))),
-            f"D={diffusion_constant} dim={-a:.3}",
+            f"D={diffusion_constant} dim={-a:.4}",
             verticalalignment="center",
             horizontalalignment="center",
             rotation=-r,
