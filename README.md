@@ -2,6 +2,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jonaspleyer/cr_bayesian_optim/CI.yml?style=flat-square&label=Build)
 ![GitHub License](https://img.shields.io/github/license/jonaspleyer/cr_bayesian_optim?style=flat-square&label=License)
 [![Docs](https://img.shields.io/github/actions/workflow/status/jonaspleyer/cr_bayesian_optim/sphinx_doc.yml?label=Docs&style=flat-square)](https://github.com/jonaspleyer/cr_bayesian_optim/actions)
+[![PyPI - Version](https://img.shields.io/pypi/v/cr_bayesian_optim?style=flat-square)]()
 
 # cr_bayesian_optim
 
