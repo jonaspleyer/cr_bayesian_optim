@@ -29,7 +29,7 @@ def fractal_dim_over_time():
         options.domain.diffusion_constant = diffusion_constant
         cells, _ = crb.sim_branching.load_or_compute_full(options)
 
-        iterations = sorted(cells.keys())[::4]
+        iterations = sorted(cells.keys())
         colony_diam = []
         dims_mean = []
         dims_std = []
