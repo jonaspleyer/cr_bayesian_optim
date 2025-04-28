@@ -124,23 +124,24 @@ First notion of bayesian optimization~\cite{Kushner1964}, then in~\cite{Mockus19
 Mention AI and hyperparameter-tuning
 
 \subsection*{Existing Literature}
-\cite{Jrgensen2022}
-\begin{itemize}
-    \item construct light-weight surrogate models or estimate posterior directly
-        \todo{can these surrogate models always be constructed?}
-    \item Good Inference possible with low number of simulations
-    \item estimating parameters requirs specific choice of method
-\end{itemize}
 
 Maybe cite these:
 \cite{Lima2021,Duswald2024}
 
 \begin{itemize}
+    \item \cite{Jrgensen2022} construct light-weight surrogate models or estimate posterior directly
+        \todo{can these surrogate models always be constructed?}; Good Inference possible with low
+        number of simulations; estimating parameters requirs specific choice of method
     \item \cite{Stephan2024} "Agent-based approaches for biological modeling in oncology: A
         literature review" (it reads very badly tbh, many mistakes in plain sight, literature review
         not by hand but automation simply querying search engines, not scientific at all imho)
     \item \cite{An2016} use surrogate models for ABM Optimization (only uses population-based
         measures; no spatial stuff; why use an ABM in the first place?)
+    \item \cite{Grazzini2017} They assume that their system is ergodic; this excludes many
+        biological systems; perform example calculations on system with only one variable (how is
+        this useful?); afterwards numerical example with 9 parameters; both examples from trading
+        world; their understand of agent-based is totally different ot ours though so their
+        methodologies might only be similar on a very high level of abstraction
 \end{itemize}
 
 \subsubsection*{Bayesian Optimization}
