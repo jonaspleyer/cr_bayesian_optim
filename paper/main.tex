@@ -135,6 +135,14 @@ Mention AI and hyperparameter-tuning
 Maybe cite these:
 \cite{Lima2021,Duswald2024}
 
+\begin{itemize}
+    \item \cite{Stephan2024} "Agent-based approaches for biological modeling in oncology: A
+        literature review" (it reads very badly tbh, many mistakes in plain sight, literature review
+        not by hand but automation simply querying search engines, not scientific at all imho)
+    \item \cite{An2016} use surrogate models for ABM Optimization (only uses population-based
+        measures; no spatial stuff; why use an ABM in the first place?)
+\end{itemize}
+
 \subsubsection*{Bayesian Optimization}
 \begin{itemize}
     \item Requires less function evaluations
@@ -183,7 +191,7 @@ Maybe cite these:
 \subsection{Bacterial Branching}
 \label{subsection:bacterial-branching}
 \begin{itemize}
-    \item Calculate fractal dimension of branching pattern $\rightarrow$ This is really difficult
+    \item Calculate fractal dimension of branching pattern
     \item Optimize parameters to obtain desired fractal dimension in branching pattern
     \item Really expensive optimization due to simulation and fractal dimension.
         Takes in the order of minutes (up to $30$min) for one simulation.
@@ -235,6 +243,15 @@ Maybe cite these:
     }
     \label{fig:fractal-dim}
 \end{figure}
+
+\begin{itemize}
+    \item Use curve in \ref{fig:fractal-dim} (H) to calculate fractal dimension very early on
+    \item extrapolate curve (with error) to obtain final fractal dimension
+    \item Use this procedure to explore parameter space much more quickly
+    \item This needs some type of notion of "certainty" for the results since results at earlier
+        time points $t_1$ are not the final results at $t_\text{fin}$.
+    \item \todo{Runtime plot of simulation time}
+\end{itemize}
 
 %...................................................................................................
 \subsubsection{Calculating the fractal dimension}
