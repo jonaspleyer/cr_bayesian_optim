@@ -84,3 +84,5 @@ docs/_build/
 Cargo.lock
 
 out
+
+paper.zip
