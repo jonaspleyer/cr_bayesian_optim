@@ -387,4 +387,4 @@ def fractal_dim_main():
     fractal_dim_comparison()
     fractal_dim_over_time()
     runtime_plot()
-    fractal_dim_vs_diffusion_constant()
+    fractal_dim_bacteria_count_vs_diffusion_constant()
