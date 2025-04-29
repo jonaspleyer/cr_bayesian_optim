@@ -310,13 +310,15 @@ def runtime_plot():
     plt.close(fig)
 
 
-def fractal_dim_vs_diffusion_constant():
+def fractal_dim_bacteria_count_vs_diffusion_constant():
     options = produce_options()
 
     fig, ax = plt.subplots(figsize=(8, 8))
+    ax2 = ax.twinx()
 
     data = []
     data_err = []
+    n_cells = []
     diffusion_constants = [0.1, 0.5, 2.0, 5.0, 80.0]
     for diffusion_constant in diffusion_constants:
         options.domain.diffusion_constant = diffusion_constant
@@ -329,6 +331,7 @@ def fractal_dim_vs_diffusion_constant():
 
         data.append(-dim)
         data_err.append(ddim)
+        n_cells.append(len(cells))
 
     ax.plot(diffusion_constants, data, color=COLOR1, label="dim")
     ax.fill_between(
@@ -338,6 +341,7 @@ def fractal_dim_vs_diffusion_constant():
         color=COLOR2,
         alpha=0.3,
     )
+    ax2.plot(diffusion_constants, n_cells, color=COLOR3, label="N Cells")
 
     ax.set_xlim(np.min(diffusion_constants), np.max(diffusion_constants))
     ax.set_xlabel("Diffusion Constant")
@@ -347,7 +351,15 @@ def fractal_dim_vs_diffusion_constant():
     ax.minorticks_on()
     ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
     ax.set_axisbelow(True)
+
+    handles1, labels1 = ax.get_legend_handles_labels()
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    handles = [*handles1, *handles2]
+    labels = [*labels1, *labels2]
+
     ax.legend(
+        handles,
+        labels,
         loc="upper center",
         bbox_to_anchor=(0.5, 1.10),
         ncol=4,
