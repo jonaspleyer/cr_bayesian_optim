@@ -221,7 +221,11 @@ def runtime_plot():
     options = produce_options()
     diffusion_constants = [80, 5, 0.5]
 
+    x_all = []
+    y_all = []
+
     fig, ax = plt.subplots(figsize=(8, 8))
+    ax2 = ax.twinx()
 
     for diffusion_constant in diffusion_constants:
         options.domain.diffusion_constant = diffusion_constant
@@ -233,8 +237,23 @@ def runtime_plot():
         t = np.array(list(cells.keys())) * options.time.dt / 60
         dt = times - times[0]
 
+        growth = np.array([len(c) for c in cells.values()])
+
+        x_all.append(t)
+        y_all.append(dt)
+
         # Plot Data
-        ax.plot(t, dt, color=crb.plotting.COLOR1, label="Data")
+        ax.plot(
+            t,
+            dt,
+            color=crb.plotting.COLOR1,
+            label="Data",
+            linestyle=(0, (5, 5)),
+            linewidth=2,
+        )
+
+        # Plot Growth Data
+        ax2.plot(t, growth, color=crb.plotting.COLOR3, label="N Cells")
 
         popt, _ = sp.optimize.curve_fit(lambda t, a, b: a * t**2 + b * t, t, dt)
 
@@ -243,9 +262,24 @@ def runtime_plot():
 
         # Plot Fit
         ax.plot(
-            t, yfit, label="At²+Bt", color=COLOR5, linestyle=(0, (6, 4)), linewidth=2
+            t, yfit, label="At²+Bt", color=COLOR5, linestyle=(4, (3, 7)), linewidth=2
         )
         ax.set_xlim(np.min(t).astype(float), np.max(t).astype(float))
+
+    x_all = np.array(x_all)
+    y_all = np.array(y_all)
+    for n, diffusion_constant in enumerate(diffusion_constants):
+        ind = int(np.round((0.3 + 0.2 * n) * len(x_all[n])))
+        angle = calculate_angle(x_all[n], y_all[n], np.min(y_all), np.max(y_all), ind)
+        y = y_all[n][ind] + 0.05 * (np.max(y_all) - np.min(y_all))
+        ax.text(
+            x_all[n][ind],
+            y,
+            f"D={diffusion_constant}",
+            rotation=angle,
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
 
     ax.set_ylabel("Runtime [s]")
     ax.set_xlabel("Simulation Time [min]")
@@ -253,12 +287,14 @@ def runtime_plot():
     ax.minorticks_on()
     ax.grid(True, which="minor", linestyle="-", linewidth=0.25, alpha=0.15)
     ax.set_axisbelow(True)
+    ax2.set_ylabel("Count")
 
     ax.legend()
 
     handles, labels = ax.get_legend_handles_labels()
-    handles = [handles[0], handles[1]]
-    labels = [labels[0], labels[1]]
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    handles = [handles[0], handles[1], handles2[0]]
+    labels = [labels[0], labels[1], labels2[0]]
 
     ax.legend(
         handles,
