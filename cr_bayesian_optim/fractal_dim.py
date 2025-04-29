@@ -186,7 +186,7 @@ def fractal_dim_comparison():
 
     ax.legend()
     ax.set_xlabel("Voxel Size [µm]")
-    ax.set_ylabel("Count")
+    ax.set_ylabel("Count Voxels")
     ax.set_ylim((ymin, ymax))
     ax.set_xlim((xmin, xmax))
     ax.set_xscale("log")
