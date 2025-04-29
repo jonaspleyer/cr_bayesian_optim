@@ -8,6 +8,17 @@ from glob import glob
 import os
 
 
+def calculate_angle(t, y, ymin, ymax, ind):
+    ratio = (
+        (y[ind + 1] - y[ind])
+        / (ymax - ymin)
+        / (t[ind + 1] - t[ind])
+        * (np.max(t) - np.min(t))
+    )
+    angle = 360 / (2 * np.pi) * np.atan(ratio)
+    return angle
+
+
 def produce_options():
     options = crb.Options(
         show_progressbar=True, storage_location="out/fractal_dim_multi"
@@ -76,16 +87,7 @@ def fractal_dim_over_time():
         )
 
         ind = int(np.round(0.3 * len(t[i])))
-        angle = (
-            360
-            / (2 * np.pi)
-            * np.atan(
-                (yfit[ind + 1] - yfit[ind])
-                / (np.max(y1) - np.min(y1))
-                / (t[i][ind + 1] - t[i][ind])
-                * (np.max(t) - np.min(t))
-            )
-        )
+        angle = calculate_angle(t[i], yfit, np.min(y1), np.max(y1), ind)
         y = yfit[ind] + 0.15 * (np.max(yfit) - np.min(yfit))
         ax.text(
             t[i][ind],
