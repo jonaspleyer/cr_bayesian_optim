@@ -234,28 +234,14 @@ def runtime_plot():
         # Plot Data
         ax.plot(t, dt, color=crb.plotting.COLOR1, label="Data")
 
-        ind = int(np.round(0.5 * len(t)))
-        tfit = t[ind:]
-        popt, pcov = sp.optimize.curve_fit(lambda t, a, b: a * t + b, tfit, dt[ind:])
+        popt, _ = sp.optimize.curve_fit(lambda t, a, b: a * t**2 + b, t, dt)
 
         a, b = popt
-        # da = pcov[0, 0] ** 0.5
-        # db = pcov[1, 1] ** 0.5
-        yfit = a * tfit + b
-        # yfit_low = (a - da) * tfit + (b - db)
-        # yfit_high = (a + da) * tfit + (b + db)
+        yfit = a * t**2 + b
 
         # Plot Fit
-        ax.plot(
-            tfit,
-            yfit,
-            label="LR",
-            color=COLOR5,
-            linestyle=(0, (6, 4)),
-            linewidth=2,
-        )
+        ax.plot(t, yfit, label="QR", color=COLOR5, linestyle=(0, (6, 4)), linewidth=2)
         ax.set_xlim(np.min(t).astype(float), np.max(t).astype(float))
-        # ax.fill_between(tfit, yfit_low, yfit_high, color=COLOR4, alpha=0.3)
 
     ax.set_ylabel("Runtime [s]")
     ax.set_xlabel("Simulation Time [min]")
