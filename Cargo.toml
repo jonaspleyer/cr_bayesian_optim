@@ -8,13 +8,10 @@ edition = "2021"
 name = "cr_bayesian_optim"
 crate-type = ["cdylib"]
 
-[patch.crates-io]
-nalgebra = { git = "https://github.com/dimforge/nalgebra" }
-
 [dependencies]
 approxim = "0.6.5"
-cellular_raza = { git = "https://github.com/jonaspleyer/cellular_raza", features = [ "pyo3", "approx" ] }
-nalgebra = "0.33.2"
+cellular_raza = { version = "0.2.4", features = [ "pyo3", "approx" ] }
+nalgebra = { package = "nalgebra-randv09", version="0.33" }
 num = "0.4"
 pyo3 = { version = "0.24", features = ["serde"] }
 pythonize = "0.24.0"
