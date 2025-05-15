@@ -26,6 +26,3 @@ bound = 10.0
 [optimization]
 max_iter = 30
 pop_size = 120
-
-[other]
-show_progressbar = true
