@@ -163,7 +163,7 @@ Problem formulation:
 Advantages of Bayesian Optimization:
 
 \begin{itemize}
-    \item No 1st- or 2nd-order derivatives of the $f(x)$ needed
+    \item No 1st- or 2nd-order derivatives of the objective $f(x)$ needed
     \item Number of evaluation of the $f(x)$ is limited (hundreds)
     \item Global Optimization
 \end{itemize}
@@ -171,7 +171,7 @@ Advantages of Bayesian Optimization:
 Bayesian Optimization Workflow~\cite{frazier_tutorial_2018}:
 \begin{enumerate}
     \item Set a prior distribution of $f(x)$ for Gaussian Processes (GP) regression
-    \item For initial sampling $D_0$ update the posterior distribution of the objective $f$
+    \item For initial sampling $\mathbf{D}_{n_0}$ update the posterior distribution of the objective $f$
     \item Iterative algorithm:
     \begin{itemize}
         \item Choose the new $n+1$ sampling point $\tilde x$ using acquisition function
@@ -190,36 +190,36 @@ Bayesian Optimization Workflow~\cite{frazier_tutorial_2018}:
 
 \textbf{Gaussian Process (GP) Regression}
 To calculate the real objective function one can approximate it with the Gaussian process.
-As the first step one defines the prior distribution for an initial input $D_0 = x_{1:n} = (x_1,..., x_n)$
+As the first step one defines the prior distribution for an initial input $\mathbf{D}_0 = (x_1,..., x_{n_0})$
 using the initial guess for the Gaussian Process~\cite{rasmussen_gaussian_2006}:
 \begin{equation}
-    f(x_{1:n}) \propto N(\mathbf{\mu}_0(\mathbf{x}_{1:n}), \Sigma_0^2(\mathbf{x}_{1:n}))
+    f(D_0) \propto N(\mathbf{\mu}_0(\mathbf{D}_0), \Sigma_0^2(\mathbf{D}_0))
 \end{equation}
 
 Here mean and covariance matrix of the prior distribution are functions of the parameter value:
 \begin{equation}
-    \mathbf{\mu}_0(\mathbf{x}_{1:n}) = (\mathbf{\mu}_0(\tilde x_1), ..., \mathbf{\mu}_0(x_n))
+    \mathbf{\mu}_0(\mathbf{D}_0) = (\mathbf{\mu}_0(x_1), ..., \mathbf{\mu}_0(x_{n_0}))
 \end{equation}
 
 \begin{equation}
-    \Sigma_0 (\mathbf{x}_{1:n}, \mathbf{x}_{1:n}) = \begin{pmatrix}
-        \Sigma_0 (x_1, x_1)& ...&  \Sigma_0 (x_1, x_n)\\
+    \Sigma_0 (\mathbf{D}_0, \mathbf{D}_0) = \begin{pmatrix}
+        \Sigma_0 (x_1, x_1)& ...&  \Sigma_0 (x_1, x_{n_0})\\
         \vdots &  & \vdots\\
-        \Sigma_0 (x_n, x_1)& ...&  \Sigma_0 (x_n, x_n)\\
+        \Sigma_0 (x_{n_0}, x_1)& ...&  \Sigma_0 (x_{n_0}, x_{n_0})\\
     \end{pmatrix}
 \end{equation}
 
 The prior distribution is chosen on the basis of the knowledge of the system.
 Possible choices of the mean and kernel functions are the following:
 
-Mean function:
+Mean function initial guess:
     \begin{itemize}
         \item Constant value $\mu_0 = \mu$
         \item $\mu_0 = \mu + \sum_{i=1}^p \beta_i \psi_i (x)$\\
         $\psi_i$: parametric function, often low-order polynomial
     \end{itemize}
 
-    Kernel function:
+    Kernel function initial guess:
     \begin{itemize}
         \item If $|x-x'|<|x-x''|$ then $\Sigma_0(x, x')<\Sigma_0(x, x')$
         \item Positive semi-definite function
@@ -238,23 +238,22 @@ Mean function:
     \end{itemize}
     \todo{Can be tested hoe different prior assumptions can change optimization results.}
 
-Given the previous iteration step head $n$ points $\mathbf{x}_{1:n} = (x_1, ..., x_n)$
-adding a new sampling point $\tilde x$ gives the conditional distribution of $f(x)$~\cite{rasmussen_gaussian_2006}:
+Given the previous iteration step had $n$ points $\mathbf{D}_n = (x_1, ..., x_n)$ and the distribution of the objective $f(\mathbf{D}_n)$ then for a new sampling point $\tilde x$ one can calculate the conditional distribution of $f(x)$~\cite{rasmussen_gaussian_2006}:
 
 \begin{equation}
-    f(\tilde x)|f(\mathbf{x}_{1:n}) \propto N(\mu_n(\tilde x), \sigma_n^2(\tilde x))
+    f(\tilde x)|f(\mathbf{D}_n) \propto N(\mu_n(\tilde x), \sigma_n^2(\tilde x))
     \label{eq:cond_distrib_posterior}
 \end{equation}
 here the posterior mean function can be calculated as 
 \begin{equation}
-    \mu_n (\tilde x) = \Sigma_0 (\tilde x, \mathbf{x}_{1:n}) \Sigma_0 (x_{1:n}, \mathbf{x}_{1:n})^{-1} (f(\mathbf{x}_{1:n})-\mu_0 (\mathbf{x}_{1:n})) + \mu_0 (\tilde x)
+    \mu_n (\tilde x) = \Sigma_0 (\tilde x, \mathbf{D}_n) \Sigma_0 (\mathbf{D}_n, \mathbf{D}_n)^{-1} (f(\mathbf{D}_n)-\mu_0 (\mathbf{D}_n)) + \mu_0 (\tilde x)
     \label{eq:mean_posterior}
 \end{equation}
 and the posterior variance of this conditional distribution is
 \begin{equation}
-    \sigma^2_n (\tilde x) = \Sigma_0 (\tilde x, \tilde x) - \Sigma_0 (\tilde x, \mathbf{x}_{1:n}) \Sigma_0 (\mathbf{x}_{1:n}, \mathbf{x}_{1:n})^{-1} \Sigma_0 (\mathbf{x}_{1:n}, \tilde x)
+    \sigma^2_n (\tilde x) = \Sigma_0 (\tilde x, \tilde x) - \Sigma_0 (\tilde x, \mathbf{D}_n) \Sigma_0 (\mathbf{D}_n, \mathbf{D}_n)^{-1} \Sigma_0 (\mathbf{D}_n, \tilde x).
     \label{eq:variance_posterior}
-\end{equation}.
+\end{equation}
 
 Equations~(\ref{eq:cond_distrib_posterior}-\ref{eq:variance_posterior}) are calculated for each optimization step and are needed to further evaluate the acquisition function.
 
@@ -267,8 +266,8 @@ To choose the next input or sampling point, the calculation of the acquisition f
         \begin{equation*}
             EI_n (\tilde x) = E_n [\max(f(\tilde x)-f^*_n, 0)]
         \end{equation*}
-        $E_n$: the expectation taken under the posterior distribution calculated n the previous step with mean $\mu_n(\tilde x)$ and variance $\sigma^2_n (\tilde x)$\\
-        $f^*_n = \max f({\mathbf{x}_{1:n}})$
+        $E_n$: the expectation taken under the posterior distribution calculated for the previous step with mean $\mu_n(\tilde x)$ and variance $\sigma^2_n (\tilde x)$\\
+        where $f^*_n = \max f({\mathbf{D}_n})$
     
         Expected improvement algorithm~\cite{movckus1975bayesian, Jones1998}:
         \begin{equation*}

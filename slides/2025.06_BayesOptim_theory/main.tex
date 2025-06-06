@@ -113,7 +113,7 @@ Advantages of the Bayesian Optimization:
             \begin{enumerate}
                 \item Set a prior distribution of $f(x)$ for Gaussian Processes (GP) regression
 
-                \item For initial sampling $D_0$
+                \item For initial sampling $\mathbf{D}_{n_0}$
                 update the posterior distribution of the objective $f$
                 \vspace{2mm}
                 \item
@@ -138,20 +138,20 @@ Advantages of the Bayesian Optimization:
 {\nologo \frame{	
 	\frametitle{Gaussian Process (GP) Regression}
 
-    For an initial input $D_0 = x_{1:n} = (x_1,..., x_n)$
+    For an initial input $\mathbf{D}_{n_0} = (x_1,..., x_{n_0})$
     the resulting prior distribution:
     \begin{equation*}
-        f(x_{1:n}) \propto N(\mathbf{\mu}_0(\mathbf{x}_{1:n}), \Sigma_0^2(\mathbf{x}_{1:n}))
+        f(\mathbf{D}_{n_0}) \propto N(\mathbf{\mu}_0(\mathbf{D}_{n_0}), \Sigma_0^2(\mathbf{D}_{n_0}))
     \end{equation*}
 
     \vspace{2mm}
     Here mean and covariance matrix function:
    \begin{equation*}
-       \mathbf{\mu}_0(\mathbf{x}_{1:n}) = (\mathbf{\mu}_0(\tilde x_1), ..., \mathbf{\mu}_0(x_n))
+       \mathbf{\mu}_0(\mathbf{D}_{n_0}) = (\mathbf{\mu}_0(\tilde x_1), ..., \mathbf{\mu}_0(x_n))
    \end{equation*}
 
     \begin{equation*}
-       \Sigma_0 (\mathbf{x}_{1:n}, \mathbf{x}_{1:n}) = \begin{pmatrix}
+       \Sigma_0 (\mathbf{D}_{n_0}, \mathbf{D}_{n_0}) = \begin{pmatrix}
            \Sigma_0 (x_1, x_1)& ...&  \Sigma_0 (x_1, x_n)\\
            \vdots &  & \vdots\\
            \Sigma_0 (x_n, x_1)& ...&  \Sigma_0 (x_n, x_n)\\
@@ -164,21 +164,21 @@ Advantages of the Bayesian Optimization:
 {\nologo \frame{	
 	\frametitle{Gaussian Process Regression}
 
-    Given previous iteration step head $n$ points $\mathbf{x}_{1:n} = (x_1, ..., x_n)$
+    Given previous iteration step head $n$ points $\mathbf{D}_n = (x_1, ..., x_n)$
     adding new sampling point $\tilde x$ give conditional distribution of $f(x)$:
 
     \begin{equation*}
-        f(\tilde x)|f(\mathbf{x}_{1:n}) \propto N(\mu_n(\tilde x), \sigma_n^2(\tilde x))
+        f(\tilde x)|f(\mathbf{D}_n) \propto N(\mu_n(\tilde x), \sigma_n^2(\tilde x))
     \end{equation*}
 
     Posterior mean:
     \begin{equation*}
-        \mu_n (\tilde x) = \Sigma_0 (\tilde x, \mathbf{x}_{1:n}) \Sigma_0 (x_{1:n}, \mathbf{x}_{1:n})^{-1} (f(\mathbf{x}_{1:n})-\mu_0 (\mathbf{x}_{1:n})) + \mu_0 (\tilde x)
+        \mu_n (\tilde x) = \Sigma_0 (\tilde x, \mathbf{D}_n) \Sigma_0 (\mathbf{D}_n, \mathbf{x}_{1:n})^{-1} (f(\mathbf{D}_n)-\mu_0 (\mathbf{D}_n)) + \mu_0 (\tilde x)
     \end{equation*}
 
     Posterior variance:
     \begin{equation*}
-        \sigma^2_n (\tilde x) = \Sigma_0 (\tilde x, \tilde x) - \Sigma_0 (\tilde x, \mathbf{x}_{1:n}) \Sigma_0 (\mathbf{x}_{1:n}, \mathbf{x}_{1:n})^{-1} \Sigma_0 (\mathbf{x}_{1:n}, \tilde x)
+        \sigma^2_n (\tilde x) = \Sigma_0 (\tilde x, \tilde x) - \Sigma_0 (\tilde x, \mathbf{D}_n) \Sigma_0 (\mathbf{D}_n, \mathbf{D}_n)^{-1} \Sigma_0 \mathbf{D}_n, \tilde x)
     \end{equation*}
 
 
@@ -225,7 +225,7 @@ Advantages of the Bayesian Optimization:
         EI_n (\tilde x) = E_n [\max(f(\tilde x)-f^*_n, 0)]
     \end{equation*}
     $E_n$: the expectation taken under the posterior distribution calculated n the previous step with mean $\mu_n(\tilde x)$ and variance $\sigma^2_n (\tilde x)$\\
-    $f^*_n = \max f({\mathbf{x}_{1:n}})$
+    $f^*_n = \max f({\mathbf{D}_n})$
 
     \vspace{3mm}
     Expected improvement algorithm:
