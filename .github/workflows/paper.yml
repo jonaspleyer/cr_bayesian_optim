@@ -11,6 +11,9 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v4
 
+      - name: Update the system
+        uses: sudo apt-get update
+        
       - name: Install latexmk
         run: sudo apt-get install texlive-full
 
