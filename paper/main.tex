@@ -178,6 +178,18 @@ Maybe cite these:
         this useful?); afterwards numerical example with 9 parameters; both examples from trading
         world; their understand of agent-based is totally different ot ours though so their
         methodologies might only be similar on a very high level of abstraction
+    \item This paper mentions many examples in ecology~\cite{Piou2009}
+        Introduce the notion of "pattern-oriented" modeling; Only theoretical paper, no application;
+        They propose an information-criterion to estimate parameters;
+\end{itemize}
+
+Conclusion:\\
+There is no paper which combine at least 3 the following points:
+\begin{itemize}
+    \item Bayesian Optimization
+    \item \ac{abm} in Biology
+    \item Application to Examples
+    \item Examples where space is a true component of the model, not just a side-effect
 \end{itemize}
 
 \subsubsection*{Bayesian Optimization}
@@ -187,7 +199,8 @@ Problem formulation:
 \end{equation*}
 
 \begin{itemize}
-    \item Not large number of dimensions of the parameter space $d \leq 20$
+    \item Not large number of dimensions of the parameter space $d \leq 20$\todo{this might be a
+        problem}
     \item $A$: hyper-rectangle or $d$-dimensional simplex
     \item $f$ is a continuous objective function
     \item $f$ is a "black-box": structure of the function is not known
@@ -210,6 +223,12 @@ Bayesian Optimization Workflow~\cite{frazier_tutorial_2018}:
         \item Choose the new $n+1$ sampling point $\tilde x$ using acquisition function
         \item Calculate function $f(\tilde x)$
         \item Update posterior distribution of $f(x)$
+        \item \todo{can we parallelize this process?}\\
+            can we extend the bayesian algorithm to process
+            multiple evaluations of $f(\tilde x)$ in parallel?
+        \item \todo{can we discretize this algorithm as well?}\\
+            Then we could reuse existing results instead of calculating new ones when restarting a
+            optimization
     \end{itemize}
     \item Repeat point 3 until the number of sampling points $n=N$
 \end{enumerate}
