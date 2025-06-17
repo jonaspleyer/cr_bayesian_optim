@@ -356,12 +356,19 @@ To choose the next input or sampling point, the calculation of the acquisition f
 
 
 %###################################################################################################
-\section{Target System}
+\section{Target Systems}
 \label{section:target-system}
 \begin{itemize}
     \item Make clear that black-box optimization is required
     \item Should have some application for real-world scenarios
 \end{itemize}
+
+In order to compare various optimization methods, we study two distinct target systems.
+The first one aims to estimate parameters of the \ac{abm} by comparing individual agents with
+experimental data.
+Meanwhile, the second system represents the use-case of an objective function which is applied to a
+large collection of agents.
+We use cellular\_raza~\cite{Pleyer2025} to implement the numerical realization of these systems.
 
 %---------------------------------------------------------------------------------------------------
 \subsection{Bacterial Rods}
@@ -372,6 +379,41 @@ To choose the next input or sampling point, the calculation of the acquisition f
     \item Fit agents via image comparison (see \texttt{cr\_mech\_coli})
     \item neighbor interaction $\rightarrow$ not diff.-able
 \end{itemize}
+
+This model describes the growth and interactions of rod-shaped bacteria such as \textit{E.Coli} or
+\textit{B.Subtilis}.
+It has been published with cellular\_raza~\cite{Pleyer2025} and consists of 4 simulation aspects.
+\paragraph{Mechanics}
+individual bacteria are represented by a collection of vertices $\vec{v}_i$ which are coupled to
+each other via springs.
+In addition, a bending force acts between the angles of connecting edges, thus promoting a straight
+shape without curvature.
+\paragraph{Interaction}
+Bacteria exert forces which repell or attract each other.
+These forces act between a single vertex $\vec{v}_i$ on one agent and the closest point on each
+connection between two vertices $\vec{w}_j$ and $\vec{w}_{j+1}$ of the interacting agent.
+\paragraph{Cell Cycle}
+Each cell-agent is continuously growing, thus extending the length of the rod via the insertion of
+new material at the cylindtrical part.
+Once they reach a certain length threshold, the bacteria divide in the middle.
+During this process, new vertices are determined such that the resulting two new bacteria align
+identically within the path of the vertices of the mother-cell.
+\paragraph{Domain}
+We can choose the simulation dimension (2D,3D).
+For the estimation of individual parameters, we restrict ourselves to 2D to realistically depict the
+bacterial growth on a plate.
+The domain has reflective boundary conditions which are however not applied since our bacteria are
+located far enough in the center of the simulation domain.
+
+Figure~\ref{fig:bacterial-rods-sim} shows various results of numerical simulations of this model.
+Subfigure (A-B) show the growth of these bacteria inside a cuboid, thus slowly filling up the space
+from the left to right and favoring an alignment of the rods along this dimension of growth.
+Meanwhile, subfigures (C-E) show snapshots of a shallow 3D simulation where the postiion of agents
+has been converted to individual cell-masks such as produced by cell-segmentation algorithms.
+The last subfigures (F-G) show microscopic images from which we extracted the position of the
+bacterial agents and then made a prediction for the position of the rod-agents, which could
+now be compared with the experimental data (i.e. the next microscopic image) in order to estimate
+the parameters of the system.
 
 \begin{figure}[H]
     \centering
