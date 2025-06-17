@@ -122,11 +122,44 @@ pdfkeywords={},
 %###################################################################################################
 \section{Introduction}
 \label{section:introduction}
-First notion of bayesian optimization~\cite{Kushner1964}, then in~\cite{Mockus1978}.
+\begin{itemize}
+    \item First notion of bayesian optimization~\cite{Kushner1964}, then in~\cite{Mockus1978}.
+    \item Mention AI and hyperparameter-tuning
+\end{itemize}
 
-Mention AI and hyperparameter-tuning
+\acp{abm} are near unmatched in their ability to describe spatial phenomena which arise from the
+behaviour of individual cells (agents).
+They are characterized by the idea to simlate individual agents with possibly distinct parameters
+which give rise to collective phenomena.
+Their application is most justified in areas where the spatial component of the model is the most
+relevant aspect.
+Consequently, we focus on \acp{abm} where this holds true.\\
+The process of parameter estimation of \acp{abm} can be quite complex.
+A popular approach consists of 3 steps.
+First, we run multiple simulations, thus gathering (possibly stochastic) data.
+Afterwards, we evaluate a chosen objective function which might depend on the whole history of the
+\ac{abm}.
+And lastly, we analyze the obtained distributions for our properties of interest i.e. by comparing
+them with experimental data.
+While this process is rather simple, and can thus can be realized very easily, the problem arises in
+the interpretability of the results.
+It promotes so-called "look-alike" models in which the produced results are not compared
+quantitatively.
+This circumstance is further complicated by the fact that the evaluation of the \ac{abm} can be
+numerically very expensive.
+Furthermore, by restricing oneself to the evaluation of objective functions, it is unclear if every
+parameter of the \ac{abm} can be estimated at all which could be checked via sensitivy-analysis.
+But this process is more convoluted compared to simpler models such as \acp{ode} due to the
+numerically expensive evaluation and the fact that it is generally not possible to calculate a
+jacobian of the objective function.
 
-\subsection*{Existing Literature}
+\begin{itemize}
+    \item optimization algorithms: which one makes sense
+    \item we need black box optimization
+    \item ...
+\end{itemize}
+
+\subsection*{Existing Literature \acp{abm}}
 
 Maybe cite these:
 \cite{Lima2021,Duswald2024}
