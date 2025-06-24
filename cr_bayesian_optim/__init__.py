@@ -29,5 +29,6 @@ type SingleIterSubDomains = dict[int, dict]
 import cr_bayesian_optim.sim_branching as sim_branching
 import cr_bayesian_optim.plotting as plotting
 import cr_bayesian_optim.optimization as optimization
+from cr_bayesian_optim.optimize_bacterialrods import *
 
 from .fractal_dim import fractal_dim_main
