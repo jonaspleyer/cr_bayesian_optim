@@ -236,7 +236,11 @@ Bayesian Optimization Workflow~\cite{frazier_tutorial_2018}:
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{figures/BayesOpt_scheme.PNG}
-    \caption{\footnotesize{Three iterations of Bayesian optimization. The unknown objective function is approximated with at Gaussian process (GP) at each iteration. The figure shows the mean and confidence intervals for this process. The acquisition function is in the lower green shaded plots. The acquisition is high where the GP predicts a high objective (exploitation) and where the prediction uncertainty is high (exploration).~\cite{wang_bayesian_2016}}}
+    \caption{\footnotesize{Three iterations of Bayesian optimization.
+    The unknown objective function is approximated with at Gaussian process (GP) at each iteration.
+    The figure shows the mean and confidence intervals for this process.
+    The acquisition function is in the lower green shaded plots.
+    The acquisition is high where the GP predicts a high objective (exploitation) and where the prediction uncertainty is high (exploration).~\cite{wang_bayesian_2016}}}
     \label{fig:BayesOptim_point choosing}
 \end{figure}
 
@@ -245,7 +249,7 @@ To calculate the real objective function one can approximate it with the Gaussia
 As the first step one defines the prior distribution for an initial input $\mathbf{D}_0 = (x_1,..., x_{n_0})$
 using the initial guess for the Gaussian Process~\cite{rasmussen_gaussian_2006}:
 \begin{equation}
-    f(D_0) \propto N(\mathbf{\mu}_0(\mathbf{D}_0), \Sigma_0^2(\mathbf{D}_0))
+     f(\mathbf{D}_0) \propto N(\mathbf{\mu}_0(\mathbf{D}_0), \Sigma_0^2(\mathbf{D}_0))
 \end{equation}
 
 Here mean and covariance matrix of the prior distribution are functions of the parameter value:
@@ -342,6 +346,7 @@ To choose the next input or sampling point, the calculation of the acquisition f
               \item More suitable for noisy evaluations
               \item In EI the last evaluated point is the solution, in KG we allow any solution, even if it was not evaluated previously.
           \end{itemize}
+    \item Upper-confidence based (UCB) algorithm~\cite{Srinivas_2012}
     \item Entropy search~\cite{hennig2012entropy}
     \item Predictive entropy search~\cite{hernandez2014predictive}
 \end{enumerate}

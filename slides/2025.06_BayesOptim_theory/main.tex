@@ -245,6 +245,8 @@ Advantages of the Bayesian Optimization:
 
 {\nologo \frame{	
 	\frametitle{Acquisition function}
+    For noisy samples:
+
       \textbf{Knowledge Gradient (KG)}:
       \begin{equation*}
           KG_n(\tilde x) = E_n [\mu^*_{n+1} - \mu^*_{n}|x_{n+1}=\tilde x]
@@ -253,9 +255,11 @@ Advantages of the Bayesian Optimization:
 
     \vspace{3mm}
       \begin{itemize}
-          \item More suitable for noisy evaluations
           \item In EI the last evaluated point is the solution, in KG we allow any solution, even if it was not evaluated previously.
       \end{itemize}
+
+    \vspace{3mm}
+    \textbf{Upper-confidence based (UCB) algorithm}:
 
 }}
 
