@@ -13,7 +13,7 @@ jobs:
 
       - name: Update the system
         run: sudo apt-get update
-        
+
       - name: Install latexmk
         run: sudo apt-get install texlive-full
 
