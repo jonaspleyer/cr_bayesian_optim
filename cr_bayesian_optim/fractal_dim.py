@@ -9,20 +9,13 @@ import os
 
 
 def calculate_angle(t, y, ymin, ymax, ind):
-    ratio = (
-        (y[ind + 1] - y[ind])
-        / (ymax - ymin)
-        / (t[ind + 1] - t[ind])
-        * (np.max(t) - np.min(t))
-    )
+    ratio = (y[ind + 1] - y[ind]) / (ymax - ymin) / (t[ind + 1] - t[ind]) * (np.max(t) - np.min(t))
     angle = 360 / (2 * np.pi) * np.atan(ratio)
     return angle
 
 
 def produce_options():
-    options = crb.Options(
-        show_progressbar=True, storage_location="out/fractal_dim_multi"
-    )
+    options = crb.Options(show_progressbar=True, storage_location="out/fractal_dim_multi")
     options.time.t_max = 2000
     options.domain.domain_size = 2000
     options.time.dt = 0.3
@@ -47,9 +40,7 @@ def fractal_dim_over_time():
         for i in tqdm(iterations, desc="Calculating dim(t)"):
             pos = np.array([c[0].mechanics.pos for c in cells[i].values()])
 
-            _, _, popt, pcov = crb.sim_branching.calculate_fractal_dim_for_pos(
-                pos, options, None
-            )
+            _, _, popt, pcov = crb.sim_branching.calculate_fractal_dim_for_pos(pos, options, None)
             dims_mean.append(-popt[0])
             dims_std.append(pcov[0, 0] ** 0.5)
 
@@ -62,9 +53,7 @@ def fractal_dim_over_time():
     # Plot Fractal Dimension
     for i in range(len(t)):
         ax.plot(t[i], y1[i], label="dim", color=COLOR1)
-        ax.fill_between(
-            t[i], y1[i] - y1_err[i], y1[i] + y1_err[i], color=COLOR3, alpha=0.3
-        )
+        ax.fill_between(t[i], y1[i] - y1_err[i], y1[i] + y1_err[i], color=COLOR3, alpha=0.3)
 
         # Plot Fit
         popt, pcov = sp.optimize.curve_fit(
@@ -142,9 +131,7 @@ def fractal_dim_comparison():
         cells, out_path = crb.sim_branching.load_or_compute_last_iter(options)
         last_pos = np.array([c[0].mechanics.pos for c in cells.values()])
 
-        x, y, popt, _ = crb.sim_branching.calculate_fractal_dim_for_pos(
-            last_pos, options, out_path
-        )
+        x, y, popt, _ = crb.sim_branching.calculate_fractal_dim_for_pos(last_pos, options, out_path)
 
         results.append((x, y, popt))
         xmin = min(np.min(x), xmin)
@@ -261,9 +248,7 @@ def runtime_plot():
         yfit = a * t**2 + b * t
 
         # Plot Fit
-        ax.plot(
-            t, yfit, label="At²+Bt", color=COLOR5, linestyle=(4, (3, 7)), linewidth=2
-        )
+        ax.plot(t, yfit, label="At²+Bt", color=COLOR5, linestyle=(4, (3, 7)), linewidth=2)
         ax.set_xlim(np.min(t).astype(float), np.max(t).astype(float))
 
     x_all = np.array(x_all)

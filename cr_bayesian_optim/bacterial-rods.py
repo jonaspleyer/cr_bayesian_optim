@@ -17,12 +17,8 @@ def main():
     n_vertices = 8
 
     # Extract data from masks which have been previously generated
-    mask1 = np.loadtxt(
-        "data/crm_fit/0001/masks/image001042-markers.csv", delimiter=","
-    ).T
-    mask2 = np.loadtxt(
-        "data/crm_fit/0001/masks/image001052-markers.csv", delimiter=","
-    ).T
+    mask1 = np.loadtxt("data/crm_fit/0001/masks/image001042-markers.csv", delimiter=",").T
+    mask2 = np.loadtxt("data/crm_fit/0001/masks/image001052-markers.csv", delimiter=",").T
 
     p1 = crm.extract_positions(mask1, n_vertices)[0]
     p2 = crm.extract_positions(mask2, n_vertices)[0]

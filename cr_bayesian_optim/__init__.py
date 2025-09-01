@@ -18,12 +18,8 @@ from .cr_bayesian_optim import (
 )
 
 type CellIdentifier = tuple[int, int]
-type CellOutput = dict[
-    int, dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
-]
-type SingleIterCells = dict[
-    CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]
-]
+type CellOutput = dict[int, dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]]
+type SingleIterCells = dict[CellIdentifier, tuple[BacteriaBranching, CellIdentifier | None]]
 type SingleIterSubDomains = dict[int, dict]
 
 import cr_bayesian_optim.sim_branching as sim_branching
@@ -31,4 +27,5 @@ import cr_bayesian_optim.plotting as plotting
 import cr_bayesian_optim.optimization as optimization
 import cr_bayesian_optim.optimize_bacterialrods as optimize_bacterialrods
 
+from .optimize_bacterialrods import optimize_bacterialrods_main
 from .fractal_dim import fractal_dim_main
