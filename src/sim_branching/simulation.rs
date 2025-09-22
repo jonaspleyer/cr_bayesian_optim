@@ -99,7 +99,7 @@ pub struct Options {
     pub time: Py<TimeParameters>,
     /// Show or hide the progress bar during the simulation.
     #[approx(skip)]
-    pub show_progressbar: bool,
+    pub progressbar: bool,
     /// Specify how many threads to use for the simulation.
     /// Must be a positive integer value.
     #[approx(equal)]
@@ -123,7 +123,7 @@ impl Options {
                 bacteria: Py::new(py, <BacterialParameters as Default>::default())?,
                 domain: Py::new(py, <DomainParameters as Default>::default())?,
                 time: Py::new(py, <TimeParameters as Default>::default())?,
-                show_progressbar: false,
+                progressbar: false,
                 n_threads: 1.try_into().unwrap(),
                 storage_location: Some("out".into()),
             },
@@ -309,7 +309,11 @@ pub fn run_sim_branching(
         n_threads,
         time,
         storage,
-        show_progressbar: options.show_progressbar,
+        progressbar: if options.progressbar {
+            Some("".to_string())
+        } else {
+            None
+        },
     };
 
     let storager = run_simulation!(

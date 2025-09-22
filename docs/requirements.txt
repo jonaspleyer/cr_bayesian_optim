@@ -7,7 +7,7 @@ sphinx_subfigure==0.2.4
 bayesian-optimization==3.1.0
 scikit-optimize==0.10.2
 numpy==2.3.3
-scipy==1.16.1
+scipy==1.16.2
 joblib==1.5.2
-scikit-learn==1.7.1
+scikit-learn==1.7.2
 matplotlib==3.10.6
