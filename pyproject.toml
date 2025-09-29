@@ -16,7 +16,7 @@ dependencies = [
     "matplotlib",
     "tqdm",
     "scipy",
-    "cr-mech-coli==0.7.1",
+    "cr-mech-coli==0.8.0",
 ]
 
 [project.scripts]
